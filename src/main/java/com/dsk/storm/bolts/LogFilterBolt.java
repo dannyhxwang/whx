@@ -46,7 +46,7 @@ public class LogFilterBolt extends BaseRichBolt {
             String attrs = Joiner.on("\",\"").join(items);
             StringBuffer sb = new StringBuffer();
             sb.append("INSERT INTO ").append(Constants.UPUSERS_ATTR_TABLE).append(" VALUES (\"")
-                    .append(attrs).append("\");");
+                    .append(mid).append("\",\"").append(attrs).append("\");");
             String insert_sql = sb.toString();
 
             Connection conn = KudoManager.getInstance().getConnection();
