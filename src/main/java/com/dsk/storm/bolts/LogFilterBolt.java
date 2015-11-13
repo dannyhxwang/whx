@@ -9,6 +9,7 @@ import com.dsk.kudu.KudoManager;
 import com.dsk.utils.Constants;
 import com.dsk.utils.StringOperator;
 import com.google.common.base.Joiner;
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -42,10 +43,10 @@ public class LogFilterBolt extends BaseRichBolt {
             //primary key of tables
             String mid = StringOperator.encryptByMd5(uid + sid);
 
-            String attrs = Joiner.on(",").join(items);
+            String attrs = Joiner.on("\",\"").join(items);
             StringBuffer sb = new StringBuffer();
-            sb.append("INSERT INTO ").append(Constants.UPUSERS_ATTR_TABLE).append(" VALUES (")
-                    .append(attrs).append(");");
+            sb.append("INSERT INTO ").append(Constants.UPUSERS_ATTR_TABLE).append(" VALUES (\"")
+                    .append(attrs).append("\");");
             String insert_sql = sb.toString();
 
             Connection conn = KudoManager.getInstance().getConnection();
@@ -94,11 +95,11 @@ public class LogFilterBolt extends BaseRichBolt {
     public void update(Connection conn, String mid, String[] items) {
         StringBuffer sb = new StringBuffer();
         sb.append("UPDATE ").append(Constants.UPUSERS_ATTR_TABLE).append(" SET ")
-                .append("ptid=").append(items[1]).append(" n=").append(items[3])
-                .append(", ln=").append(items[4]).append(", ver=").append(items[5])
-                .append(", pid=").append(items[6]).append(", geoip_n=").append(items[7])
-                .append(", first_date=").append(items[8]).append(", last_date=").append(items[9])
-                .append(" where mid=").append(mid);
+                .append("ptid=\"").append(items[1]).append("\", n=\"").append(items[3])
+                .append("\", ln=\"").append(items[4]).append("\", ver=\"").append(items[5])
+                .append("\", pid=\"").append(items[6]).append("\", geoip_n=\"").append(items[7])
+                .append("\", first_date=\"").append(items[8]).append("\", last_date=\"").append(items[9])
+                .append("\" where mid=\"").append(mid).append("\";");
         String update_sql = sb.toString();
 
         Statement stmt = null;
