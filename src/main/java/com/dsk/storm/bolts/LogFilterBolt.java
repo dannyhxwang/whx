@@ -101,7 +101,7 @@ System.out.println(insert_sql);
                 .append("\", first_date=\"").append(items[8]).append("\", last_date=\"").append(items[9])
                 .append("\" where mid=\"").append(mid).append("\";");
         String update_sql = sb.toString();
-
+System.out.println(update_sql);
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
