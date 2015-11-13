@@ -70,7 +70,7 @@ System.out.println(insert_sql);
             stmt = conn.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             String className = "";
             String methodName = "";
             for(StackTraceElement elem : e.getStackTrace()) {
