@@ -22,14 +22,14 @@ public class LogProcess {
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         TopologyBuilder builder = new TopologyBuilder();
         BrokerHosts hosts = new ZkHosts("datanode1:2181,datanode2:2181,datanode4:2181");
-        String topic = "test_upusers";
-        String zkRoot = "/test_upusers";
+        String topic = "test_upusers_2";
+        String zkRoot = "/test_upusers_2";
         String id = UUID.randomUUID().toString();
         SpoutConfig spoutConfig = new SpoutConfig(hosts, topic, zkRoot, id);
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 
         builder.setSpout("spout1", new KafkaSpout(spoutConfig));
-        builder.setBolt("bolt1", new LogFilterBolt(), 15).shuffleGrouping("spout1");
+        builder.setBolt("bolt1", new LogFilterBolt(), 15).setNumTasks(2).shuffleGrouping("spout1");
 
         Config config = new Config();
         Properties props = new Properties();
