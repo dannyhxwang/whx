@@ -29,7 +29,7 @@ public class LogProcess {
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 
         builder.setSpout("spout1", new KafkaSpout(spoutConfig));
-        builder.setBolt("bolt1", new LogFilterBolt(), 5).shuffleGrouping("spout1");
+        builder.setBolt("bolt1", new LogFilterBolt(), 15).shuffleGrouping("spout1");
 
         Config config = new Config();
         Properties props = new Properties();
