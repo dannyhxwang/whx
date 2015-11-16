@@ -29,7 +29,7 @@ public class LogProcess {
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
-        builder.setSpout("spout1", new KafkaSpout(spoutConfig));
+        builder.setSpout("spout1", new KafkaSpout(spoutConfig), 2);
         builder.setBolt("bolt1", new LogFilterBolt(), 10).shuffleGrouping("spout1");
 
         Config config = new Config();
