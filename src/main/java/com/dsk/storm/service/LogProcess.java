@@ -22,8 +22,8 @@ public class LogProcess {
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         TopologyBuilder builder = new TopologyBuilder();
         BrokerHosts hosts = new ZkHosts("datanode1:2181,datanode2:2181,datanode4:2181");
-        String topic = "test_upusers_2";
-        String zkRoot = "/test_upusers_2";
+        String topic = "test_whx_1";
+        String zkRoot = "/test_whx_1";
         String id = UUID.randomUUID().toString();
         SpoutConfig spoutConfig = new SpoutConfig(hosts, topic, zkRoot, id);
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
@@ -38,6 +38,6 @@ public class LogProcess {
         props.put("serializer.class", "kafka.serializer.StringEncoder");
         config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
         config.setNumWorkers(3);
-        StormSubmitter.submitTopology("testlog", config, builder.createTopology());
+        StormSubmitter.submitTopology("testwhx", config, builder.createTopology());
     }
 }

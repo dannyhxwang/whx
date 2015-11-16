@@ -48,7 +48,6 @@ public class LogFilterBolt extends BaseRichBolt {
             sb.append("INSERT INTO ").append(Constants.UPUSERS_ATTR_TABLE).append(" VALUES (\"")
                     .append(mid).append("\",\"").append(attrs).append("\");");
             String insert_sql = sb.toString();
-System.out.println(insert_sql);
             Connection conn = KudoManager.getInstance().getConnection();
             insert(conn, insert_sql, mid, items);
 
@@ -65,12 +64,13 @@ System.out.println(insert_sql);
     }
 
     public void insert(Connection conn, String sql, String mid, String[] items) {
+        System.out.println(sql);
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             String className = "";
             String methodName = "";
             for(StackTraceElement elem : e.getStackTrace()) {
@@ -101,7 +101,8 @@ System.out.println(insert_sql);
                 .append("\", first_date=\"").append(items[8]).append("\", last_date=\"").append(items[9])
                 .append("\" where mid=\"").append(mid).append("\";");
         String update_sql = sb.toString();
-System.out.println(update_sql);
+        System.out.println(update_sql);
+
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
