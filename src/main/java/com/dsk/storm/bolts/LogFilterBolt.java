@@ -53,6 +53,9 @@ public class LogFilterBolt extends BaseRichBolt {
 
             this.collector.ack(tuple);
         } catch (Exception e) {
+//            this.collector.reportError(e);
+//            this.collector.ack(tuple);
+
             this.collector.fail(tuple);
         }
 
