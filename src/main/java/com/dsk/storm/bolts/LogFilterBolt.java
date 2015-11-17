@@ -7,6 +7,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.dsk.kudu.KudoManager;
 import com.dsk.utils.Constants;
+import com.dsk.utils.DBPool;
 import com.dsk.utils.StringOperator;
 import com.google.common.base.Joiner;
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +27,7 @@ public class LogFilterBolt extends BaseRichBolt {
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
-        conn = KudoManager.getInstance().getConnection();
+//        conn = KudoManager.getInstance().getConnection();
     }
 
     @Override
@@ -51,6 +52,7 @@ public class LogFilterBolt extends BaseRichBolt {
                     .append(mid).append("\",\"").append(attrs).append("\");");
             String insert_sql = sb.toString();
 //            Connection conn = KudoManager.getInstance().getConnection();
+            conn = DBPool.getInstance().getConnection();
             insert(conn, insert_sql, mid, items);
 
             this.collector.ack(tuple);
@@ -86,13 +88,13 @@ public class LogFilterBolt extends BaseRichBolt {
                 }
             }
         } finally {
-            /*try {
+            try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            }*/
+            }
         }
 
     }
@@ -117,7 +119,7 @@ public class LogFilterBolt extends BaseRichBolt {
         }
     }
 
-    public void cleanup() {
+    /*public void cleanup() {
         try {
             if (conn != null) {
                 conn.close();
@@ -125,5 +127,5 @@ public class LogFilterBolt extends BaseRichBolt {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }
