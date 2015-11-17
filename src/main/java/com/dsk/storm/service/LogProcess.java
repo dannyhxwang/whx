@@ -39,7 +39,7 @@ public class LogProcess {
         props.put("serializer.class", "kafka.serializer.StringEncoder");
         config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
 //        config.setNumWorkers(2);
-        config.setMaxSpoutPending(1000);
+        config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
         config.setNumAckers(3);
         StormSubmitter.submitTopology("testwhx", config, builder.createTopology());
