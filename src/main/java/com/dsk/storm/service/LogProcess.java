@@ -30,7 +30,7 @@ public class LogProcess {
         spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("spout1", new KafkaSpout(spoutConfig));
-        builder.setBolt("bolt1", new LogFilterBolt(), 10).shuffleGrouping("spout1");
+        builder.setBolt("bolt1", new LogFilterBolt()).shuffleGrouping("spout1");
 
         Config config = new Config();
         Properties props = new Properties();

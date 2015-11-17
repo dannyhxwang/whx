@@ -21,10 +21,12 @@ import java.util.Map;
  */
 public class LogFilterBolt extends BaseRichBolt {
     private OutputCollector collector;
+    private Connection conn = null;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
+        conn = KudoManager.getInstance().getConnection();
     }
 
     @Override
@@ -48,7 +50,7 @@ public class LogFilterBolt extends BaseRichBolt {
             sb.append("INSERT INTO ").append(Constants.UPUSERS_ATTR_TABLE).append(" VALUES (\"")
                     .append(mid).append("\",\"").append(attrs).append("\");");
             String insert_sql = sb.toString();
-            Connection conn = KudoManager.getInstance().getConnection();
+//            Connection conn = KudoManager.getInstance().getConnection();
             insert(conn, insert_sql, mid, items);
 
             this.collector.ack(tuple);
