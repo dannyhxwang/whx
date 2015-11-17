@@ -86,13 +86,13 @@ public class LogFilterBolt extends BaseRichBolt {
                 }
             }
         } finally {
-            try {
+            /*try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
         }
 
     }
@@ -113,6 +113,16 @@ public class LogFilterBolt extends BaseRichBolt {
             stmt = conn.createStatement();
             stmt.execute(update_sql);
         } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void cleanup() {
+        try {
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
