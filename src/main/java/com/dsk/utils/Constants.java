@@ -4,7 +4,18 @@ package com.dsk.utils;
  * Created by wanghaixing on 2015/11/12.
  */
 public class Constants {
-    public final static String UPUSERS_ATTR_TABLE = "upusers_attr_kudu_test2";
-    public final static String UPUSERS_DAYS_TABLE = "upusers_days_kudu";
+    //zookeeper
+    public static final String ZOOKEEPER_LIST = "datanode1:2181,datanode2:2181,datanode4:2181";
 
+    //kudu table
+    public static final String UPUSERS_ATTR_TABLE = "upusers_attr_kudu_test2";
+    public static final String UPUSERS_DAYS_TABLE = "upusers_days_kudu";
+
+    //storm
+    public static final String TOPIC = "test_upusers";
+    public static final String GROUP_ID = "";
+
+    //kafka
+    public static final String ENCODER = "kafka.serializer.StringEncoder";
+    public static final String BROKER_LIST = "namenode:9092,datanode1:9092,datanode4:9092";
 }

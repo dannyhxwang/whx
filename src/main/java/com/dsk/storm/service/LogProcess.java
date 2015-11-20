@@ -7,7 +7,9 @@ import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
+import clojure.lang.Cons;
 import com.dsk.storm.bolts.LogFilterBolt;
+import com.dsk.utils.Constants;
 import storm.kafka.*;
 import storm.kafka.bolt.KafkaBolt;
 
@@ -21,11 +23,10 @@ public class LogProcess {
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         TopologyBuilder builder = new TopologyBuilder();
-        BrokerHosts hosts = new ZkHosts("datanode1:2181,datanode2:2181,datanode4:2181");
-        String topic = "test_whx_1";
-        String zkRoot = "/test_whx_1";
+        BrokerHosts hosts = new ZkHosts(Constants.ZOOKEEPER_LIST);
+        String zkRoot = "/" + Constants.TOPIC;
         String id = UUID.randomUUID().toString();
-        SpoutConfig spoutConfig = new SpoutConfig(hosts, topic, zkRoot, id);
+        SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC, zkRoot, id);
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
@@ -34,9 +35,9 @@ public class LogProcess {
 
         Config config = new Config();
         Properties props = new Properties();
-        props.put("metadata.broker.list", "10.1.3.55:9092,10.1.3.56:9092,10.1.3.59:9092");
+        props.put("metadata.broker.list", Constants.BROKER_LIST);
         props.put("request.required.acks", "1");
-        props.put("serializer.class", "kafka.serializer.StringEncoder");
+        props.put("serializer.class", Constants.ENCODER);
         config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
 //        config.setNumWorkers(2);
         config.setMaxSpoutPending(5000);
