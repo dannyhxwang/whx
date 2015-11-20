@@ -59,7 +59,7 @@ public class HdfsConsumer {
 //            MessageAndMetadata<String, String> next = iterator.next();
 //            System.out.println(next.message());
             String message = iterator.next().message();
-            LOG.info(message);
+            LOG.info(message + "\n");
         }
     }
 
