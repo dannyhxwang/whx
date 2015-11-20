@@ -13,7 +13,7 @@ public class Constants {
 
     //storm
     public static final String TOPIC = "test_upusers";
-    public static final String GROUP_ID = "";
+    public static final String GROUP_ID = "TEST";
 
     //kafka
     public static final String ENCODER = "kafka.serializer.StringEncoder";
