@@ -1,4 +1,4 @@
-package com.dsk.persist;
+package com.dsk.persist.hdfs;
 
 import com.dsk.utils.Constants;
 import kafka.consumer.Consumer;

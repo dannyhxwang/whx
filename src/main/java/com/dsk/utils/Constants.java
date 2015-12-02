@@ -8,7 +8,7 @@ public class Constants {
     public static final String ZOOKEEPER_LIST = "datanode1:2181,datanode2:2181,datanode4:2181";
 
     //kudu table
-    public static final String UPUSERS_ATTR_TABLE = "upusers_attr_kudu_test2";
+    public static final String UPUSERS_ATTR_TABLE = "upusers_attr_kudu_test";
     public static final String UPUSERS_DAYS_TABLE = "upusers_days_kudu";
 
     //storm
