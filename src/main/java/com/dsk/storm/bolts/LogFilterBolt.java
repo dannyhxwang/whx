@@ -78,13 +78,13 @@ public class LogFilterBolt extends BaseRichBolt {
             stmt = conn.createStatement();
             stmt.execute(insert_sql);
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             String className = "";
             String methodName = "";
             for(StackTraceElement elem : e.getStackTrace()) {
                 className = elem.getClassName();
                 methodName = elem.getMethodName();
-                if(className.equals(this.getClass().getName()) && methodName.equals("insert")) {
+                if(className.equals(this.getClass().getName()) && methodName.equals("insertAttrTable")) {
                     updateAttrs(conn, mid, items);
                 }
             }
