@@ -46,8 +46,8 @@ public class LogFilterBolt extends BaseRichBolt {
             //primary key of tables
             String mid = StringOperator.encryptByMd5(uid + sid);
 
-            insertAttrTable(mid, items);
-//            insertDaysTable(mid, items[9]);
+//            insertAttrTable(mid, items);
+            insertDaysTable(mid, items[9]);
 
             this.collector.ack(tuple);
         } catch (Exception e) {
