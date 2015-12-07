@@ -9,7 +9,7 @@ public class Constants {
 
     //kudu table
     public static final String UPUSERS_ATTR_TABLE = "upusers_attr_kudu_test";
-    public static final String UPUSERS_DAYS_TABLE = "upusers_days_kudu";
+    public static final String UPUSERS_DAYS_TABLE = "upusers_days_kudu_test";
 
     //storm
     public static final String TOPIC = "test_upusers";
