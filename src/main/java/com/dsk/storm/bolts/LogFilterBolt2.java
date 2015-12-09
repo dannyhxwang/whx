@@ -140,7 +140,8 @@ public class LogFilterBolt2 extends BaseRichBolt {
             setOpValue(mid, fields, fieldsValue, row);
             OperationResponse rsInsert = session.apply(insert);
             if (rsInsert.hasRowError()) {
-                System.out.println(rsInsert.getRowError().getMessage());
+                System.out.println("=======================================INSERT DATA:"+mid+"---------------"+
+                        Arrays.toString(fieldsValue)+rsInsert.getRowError().getMessage());
             }
         } catch (Exception e) {
             collector.reportError(e);
