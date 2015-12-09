@@ -7,8 +7,7 @@ import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
-import clojure.lang.Cons;
-import com.dsk.storm.bolts.LogFilterBolt;
+import com.dsk.storm.bolts.LogFilterBolt2;
 import com.dsk.utils.Constants;
 import storm.kafka.*;
 import storm.kafka.bolt.KafkaBolt;
@@ -31,7 +30,7 @@ public class LogProcess {
         spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("spout1", new KafkaSpout(spoutConfig));
-        builder.setBolt("bolt1", new LogFilterBolt(), 10).shuffleGrouping("spout1");
+        builder.setBolt("bolt1", new LogFilterBolt2(), 10).shuffleGrouping("spout1");
 
         Config config = new Config();
         Properties props = new Properties();
