@@ -8,6 +8,7 @@ import backtype.storm.tuple.Tuple;
 import com.dsk.utils.Constants;
 import com.dsk.utils.DBPool;
 import com.dsk.utils.StringOperator;
+import org.apache.commons.lang.StringUtils;
 import org.kududb.client.*;
 
 import java.sql.Connection;
@@ -20,33 +21,55 @@ import java.util.Map;
  */
 public class LogFilterBolt2 extends BaseRichBolt {
     private OutputCollector collector;
+
     private Connection conn = null;
+    private String KUDU_MASTER = "namenode";
+    private String tablename = "upusers_attr_kudu_test_api";
+    private String[] fields = {"uid", "ptid", "sid", "n", "ln", "ver", "pid", "geoip_n", "first_date", "last_date"};
+
+
+    private KuduClient client;
+    private KuduTable table;
+    private KuduSession session;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
-//        conn = KudoManager.getInstance().getConnection();
+        client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
+        try {
+            table = client.openTable(tablename);
+            session = client.newSession();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+    @Override
+    public void cleanup() {
+        try {
+            client.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     @Override
     public void execute(Tuple tuple) {
         try {
             String line = tuple.getString(0);
-            System.out.println(line);
             String[] items = line.split(",");
             if (items.length != 10) {
-                System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$error line："+line);
+                System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$error line：" + line);
                 return;
             }
-
             String uid = items[0];
             String sid = items[2];
             //primary key of tables
             String mid = StringOperator.encryptByMd5(uid + sid);
-
             insertAttrTable(mid, items);
             //insertDaysTable(mid, items[9]);
-
             this.collector.ack(tuple);
         } catch (Exception e) {
             this.collector.reportError(e);
@@ -63,28 +86,22 @@ public class LogFilterBolt2 extends BaseRichBolt {
     }
 
     public void insertAttrTable(String mid, String[] items) {
-        String KUDU_MASTER = System.getProperty(
-                "kuduMaster", "namenode");
-        KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
+        checkSession();
         // TODO insert
-        String tablename ="upusers_attr_kudu_test_api";
-        String[] fields = {"uid","ptid","sid","n","ln","ver","pid","geoip_n","first_date","last_date"};
         try {
-            KuduTable table = client.openTable(tablename);
-            KuduSession session = client.newSession();
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
             setOpValue(mid, items, fields, row);
             OperationResponse rsInsert = session.apply(insert);
             // TODO update
-            if (rsInsert.hasRowError()){
-                if ("key already present".equals(rsInsert.getRowError().getMessage())){
+            if (rsInsert.hasRowError()) {
+                if ("key already present".equals(rsInsert.getRowError().getMessage())) {
                     System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$key already present : update");
                     Update update = table.newUpdate();
                     PartialRow urow = update.getRow();
-                    setOpValue(mid,items,fields,urow);
+                    setOpValue(mid, items, fields, urow);
                     OperationResponse rsUpdate = session.apply(update);
-                    if (rsUpdate.hasRowError()){
+                    if (rsUpdate.hasRowError()) {
                         System.out.println(mid);
                         System.out.println(rsUpdate.getRowError());
                     }
@@ -92,22 +109,32 @@ public class LogFilterBolt2 extends BaseRichBolt {
                 System.out.println(mid);
                 System.out.println(rsInsert.getRowError());
             }
-            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$insert date : ");
+            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$insert date : "+rsInsert);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                client.shutdown();
-            } catch (Exception e) {
-                e.printStackTrace();
+        }
+    }
+
+    private void checkSession() {
+        if (session.isClosed()){
+            System.out.println("#################client is :" +client);
+            if (StringUtils.isNotEmpty(client.toString())){
+                try {
+                    table = client.openTable(tablename);
+                    session = client.newSession();
+                    // 1 hours
+                    session.setTimeoutMillis(1000*60*60);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     private void setOpValue(String mid, String[] items, String[] fields, PartialRow row) {
-        row.addString("mid",mid);
+        row.addString("mid", mid);
         for (int i = 0; i < fields.length; i++) {
-            row.addString(fields[i],items[i]);
+            row.addString(fields[i], items[i]);
         }
     }
 
@@ -156,13 +183,4 @@ public class LogFilterBolt2 extends BaseRichBolt {
         }
     }
 
-    /*public void cleanup() {
-        try {
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
 }
