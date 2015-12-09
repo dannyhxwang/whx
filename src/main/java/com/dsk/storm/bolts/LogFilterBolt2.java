@@ -113,7 +113,7 @@ public class LogFilterBolt2 extends BaseRichBolt {
                 System.out.println("=======================================INSERT DATA:" + mid + ":" + Arrays.toString(fieldsValue));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            collector.reportError(e);
         }
     }
 
