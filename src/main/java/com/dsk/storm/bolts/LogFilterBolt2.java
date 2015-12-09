@@ -115,13 +115,12 @@ public class LogFilterBolt2 extends BaseRichBolt {
 
     private void checkSession() {
         if (session.isClosed()) {
-            System.out.println("#################client is :" + client);
+            System.out.println("================================session is closed :================================" + client);
             if (StringUtils.isNotEmpty(client.toString())) {
                 try {
                     table = client.openTable(tablename);
                     session = client.newSession();
                     // 1 hours
-                    session.setTimeoutMillis(1000 * 60);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
