@@ -6,14 +6,11 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.dsk.utils.Constants;
-import com.dsk.utils.DBPool;
 import com.dsk.utils.StringOperator;
 import org.apache.commons.lang.StringUtils;
 import org.kududb.client.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -22,22 +19,18 @@ import java.util.Map;
 public class LogFilterBolt2 extends BaseRichBolt {
     private OutputCollector collector;
 
-    private Connection conn = null;
-    private String KUDU_MASTER = "namenode";
-    private String tablename = "upusers_attr_kudu_test_api";
-    private String[] fields = {"uid", "ptid", "sid", "n", "ln", "ver", "pid", "geoip_n", "first_date", "last_date"};
-
-
     private KuduClient client;
-    private KuduTable table;
     private KuduSession session;
+    private KuduTable table_attr;
+    private KuduTable table_days;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
-        client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
+        client = new KuduClient.KuduClientBuilder(Constants.KUDU_MASTER).build();
         try {
-            table = client.openTable(tablename);
+            table_attr = client.openTable(Constants.UPUSERS_ATTR_TABLE);
+            table_days = client.openTable(Constants.UPUSERS_DAYS_TABLE);
             session = client.newSession();
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,7 +53,7 @@ public class LogFilterBolt2 extends BaseRichBolt {
             String line = tuple.getString(0);
             String[] items = line.split(",");
             if (items.length != 10) {
-                System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$error line：" + line);
+                System.out.println("=======================================ERROR LINE：" + line);
                 this.collector.ack(tuple);
                 return;
             }
@@ -68,8 +61,8 @@ public class LogFilterBolt2 extends BaseRichBolt {
             String sid = items[2];
             //primary key of tables
             String mid = StringOperator.encryptByMd5(uid + sid);
-            insertAttrTable(mid, items);
-            //insertDaysTable(mid, items[9]);
+            insertUpdate(Constants.UPUSERS_ATTR_TABLE, mid, Constants.ATTR_FIELDS, items);
+            insertUpdate(Constants.UPUSERS_DAYS_TABLE, mid, Constants.DAYS_FIELDS, Arrays.asList(items[9]).toArray(new String[1]));
             this.collector.ack(tuple);
         } catch (Exception e) {
             this.collector.reportError(e);
@@ -80,105 +73,88 @@ public class LogFilterBolt2 extends BaseRichBolt {
 
     }
 
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+    /**
+     * 执行插入更新操作
+     * @param tablename
+     * @param mid
+     * @param fields
+     * @param fieldsValue
+     */
+    private void insertUpdate(String tablename, String mid, String[] fields, String[] fieldsValue) {
 
-    }
-
-    public void insertAttrTable(String mid, String[] items) {
         checkSession();
+
+        KuduTable table;
+        if (Constants.UPUSERS_ATTR_TABLE.equals(tablename)) {
+            table = table_attr;
+        } else {
+            table = table_days;
+        }
         try {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
-            setOpValue(mid, items, fields, row);
+            setOpValue(mid, fields, fieldsValue, row);
             OperationResponse rsInsert = session.apply(insert);
             if (rsInsert.hasRowError()) {
                 if ("key already present".equals(rsInsert.getRowError().getMessage())) {
-                    System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$key already present : update");
                     Update update = table.newUpdate();
                     PartialRow urow = update.getRow();
-                    setOpValue(mid, items, fields, urow);
+                    setOpValue(mid, fields, fieldsValue, urow);
                     OperationResponse rsUpdate = session.apply(update);
                     if (rsUpdate.hasRowError()) {
-                        System.out.println("UUUUUUUUUUUUUUUUUUUUUUrs update error" + rsUpdate.getRowError());
+                        System.out.println("=======================================ERROR UPDATE :" + rsUpdate.getRowError());
+                    } else {
+                        System.out.println("=======================================UPDATE DATA:" + mid + ":" + Arrays.toString(fieldsValue));
                     }
                 } else {
-                    System.out.println("IIIIIIIIIIIIIIIIIIIIIII insert error"+rsInsert.getRowError());
+                    System.out.println("=======================================ERROR INSERT :" + rsInsert.getRowError());
                 }
-
-            }else{
-                System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$insert date : " + rsInsert);
+            } else {
+                System.out.println("=======================================INSERT DATA:" + mid + ":" + Arrays.toString(fieldsValue));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * 检查Session
+     */
     private void checkSession() {
         if (session.isClosed()) {
-            System.out.println("================================session is closed :================================" + client);
+            System.out.println("================================Session is closed ================================" + client);
+            if (client == null) {
+                client = new KuduClient.KuduClientBuilder(Constants.KUDU_MASTER).build();
+            }
             if (StringUtils.isNotEmpty(client.toString())) {
                 try {
-                    table = client.openTable(tablename);
+                    table_attr = client.openTable(Constants.UPUSERS_ATTR_TABLE);
+                    table_days = client.openTable(Constants.UPUSERS_DAYS_TABLE);
                     session = client.newSession();
-                    // 1 hours
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+        System.out.println("================================Session is created ================================" + client);
     }
 
-    private void setOpValue(String mid, String[] items, String[] fields, PartialRow row) {
+    /**
+     * 设置Kudu Row
+     * @param mid
+     * @param fields
+     * @param fieldsValue
+     * @param row
+     */
+    private void setOpValue(String mid, String[] fields, String[] fieldsValue, PartialRow row) {
         row.addString("mid", mid);
         for (int i = 0; i < fields.length; i++) {
-            row.addString(fields[i], items[i]);
+            row.addString(fields[i], fieldsValue[i]);
         }
     }
 
-    public void insertDaysTable(String mid, String day) {
-        conn = DBPool.getInstance().getConnection();
-        StringBuffer sb = new StringBuffer();
-        sb.append("INSERT IGNORE INTO ").append(Constants.UPUSERS_DAYS_TABLE).append(" VALUES (\"")
-                .append(mid).append("\",\"").append(day).append("\");");
-        String insert_sql = sb.toString();
-        System.out.println(insert_sql);
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
 
-        Statement stmt = null;
-        try {
-            stmt = conn.createStatement();
-            stmt.execute(insert_sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
-
-    public void updateAttrs(Connection conn, String mid, String[] items) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("UPDATE ").append(Constants.UPUSERS_ATTR_TABLE).append(" SET ")
-                .append("ptid=\"").append(items[1]).append("\", n=\"").append(items[3])
-                .append("\", ln=\"").append(items[4]).append("\", ver=\"").append(items[5])
-                .append("\", pid=\"").append(items[6]).append("\", geoip_n=\"").append(items[7])
-                .append("\", last_date=\"").append(items[9])
-                .append("\" where mid=\"").append(mid).append("\";");
-        String update_sql = sb.toString();
-        System.out.println(update_sql);
-
-        Statement stmt = null;
-        try {
-            stmt = conn.createStatement();
-            stmt.execute(update_sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
