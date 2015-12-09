@@ -77,13 +77,16 @@ public class LogFilterBolt2 extends BaseRichBolt {
             setOpValue(mid, items, fields, row);
             OperationResponse rsInsert = session.apply(insert);
             // TODO update
-            if ("key already present".equals(rsInsert.getRowError().getMessage())){
-                System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$key already present : update");
-                Update update = table.newUpdate();
-                PartialRow urow = update.getRow();
-                setOpValue(mid,items,fields,urow);
-                OperationResponse rsUpdate = session.apply(update);
+            if (!"null".equals(rsInsert.getRowError())){
+                if ("key already present".equals(rsInsert.getRowError().getMessage())){
+                    System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$key already present : update");
+                    Update update = table.newUpdate();
+                    PartialRow urow = update.getRow();
+                    setOpValue(mid,items,fields,urow);
+                    OperationResponse rsUpdate = session.apply(update);
+                }
             }
+            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$insert date : ");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
