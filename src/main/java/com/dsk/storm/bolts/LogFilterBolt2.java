@@ -86,13 +86,11 @@ public class LogFilterBolt2 extends BaseRichBolt {
 
     public void insertAttrTable(String mid, String[] items) {
         checkSession();
-        // TODO insert
         try {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
             setOpValue(mid, items, fields, row);
             OperationResponse rsInsert = session.apply(insert);
-            // TODO update
             if (rsInsert.hasRowError()) {
                 if ("key already present".equals(rsInsert.getRowError().getMessage())) {
                     System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$key already present : update");
@@ -107,8 +105,9 @@ public class LogFilterBolt2 extends BaseRichBolt {
                     System.out.println("IIIIIIIIIIIIIIIIIIIIIII insert error"+rsInsert.getRowError());
                 }
 
+            }else{
+                System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$insert date : " + rsInsert);
             }
-            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$insert date : " + rsInsert);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,7 +121,7 @@ public class LogFilterBolt2 extends BaseRichBolt {
                     table = client.openTable(tablename);
                     session = client.newSession();
                     // 1 hours
-                    session.setTimeoutMillis(1000 * 60 * 60);
+                    session.setTimeoutMillis(1000 * 60);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
