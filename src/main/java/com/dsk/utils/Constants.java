@@ -9,15 +9,15 @@ public class Constants {
 
     //kudu table
     public static final String KUDU_MASTER = "namenode";
-    public static final String UPUSERS_ATTR_TABLE = "upusers_attr_kudu_test_api";
-    public static final String UPUSERS_DAYS_TABLE = "upusers_days_kudu_test_api";
+    public static final String UPUSERS_ATTR_TABLE = "upusers_attr_kudu_test";
+    public static final String UPUSERS_DAYS_TABLE = "upusers_days_kudu_test";
 
     public static final String[] ATTR_FIELDS = {"uid", "ptid", "sid", "n", "ln", "ver", "pid", "geoip_n", "first_date", "last_date"};
     public static final String[] DAYS_FIELDS= {"day"};
 
     //storm
-//    public static final String TOPIC = "test_upusers";
-    public static final String TOPIC = "test";
+    public static final String TOPIC = "test_upusers";
+//    public static final String TOPIC = "test";
     public static final String GROUP_ID = "TEST";
 
     //kafka

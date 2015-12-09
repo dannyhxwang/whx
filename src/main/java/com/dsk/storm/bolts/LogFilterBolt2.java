@@ -135,8 +135,9 @@ public class LogFilterBolt2 extends BaseRichBolt {
                     e.printStackTrace();
                 }
             }
+            System.out.println("================================Session is created ================================" + client);
         }
-        System.out.println("================================Session is created ================================" + client);
+
     }
 
     /**
