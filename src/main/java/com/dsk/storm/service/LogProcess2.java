@@ -38,6 +38,7 @@ public class LogProcess2 {
         props.put("request.required.acks", "1");
         props.put("serializer.class", Constants.ENCODER);
         config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
+        config.put("kafka.spout.consumer.group", "test_UPUSERS");
 //        config.setNumWorkers(2);
         config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
