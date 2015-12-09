@@ -26,7 +26,7 @@ public class LogProcess {
         BrokerHosts hosts = new ZkHosts(Constants.ZOOKEEPER_LIST);
         String zkRoot = "/" + Constants.TOPIC;
         String id = UUID.randomUUID().toString();
-        SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC, zkRoot, id);
+        SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC, zkRoot, "XXX");
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
