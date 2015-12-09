@@ -31,7 +31,7 @@ public class LogProcess2 {
         //spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("spout1", new KafkaSpout(spoutConfig));
-        builder.setBolt("bolt1", new LogFilterBolt2(), 30).shuffleGrouping("spout1");
+        builder.setBolt("bolt1", new LogFilterBolt2(), 10).shuffleGrouping("spout1");
 
         Config config = new Config();
         Properties props = new Properties();
@@ -40,7 +40,7 @@ public class LogProcess2 {
         props.put("serializer.class", Constants.ENCODER);
         config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
         config.put("kafka.spout.consumer.group", "test_UPUSERS");
-        config.setNumWorkers(3);
+        config.setNumWorkers(1);
         config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
         config.setNumAckers(3);
