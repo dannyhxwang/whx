@@ -20,6 +20,7 @@ import java.util.UUID;
  */
 public class LogProcess2 {
 
+
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         TopologyBuilder builder = new TopologyBuilder();
         BrokerHosts hosts = new ZkHosts(Constants.ZOOKEEPER_LIST);
