@@ -54,7 +54,6 @@ public class LogFilterBolt2 extends BaseRichBolt {
     }
 
 
-
     @Override
     public void execute(Tuple tuple) {
         try {
@@ -102,28 +101,28 @@ public class LogFilterBolt2 extends BaseRichBolt {
                     setOpValue(mid, items, fields, urow);
                     OperationResponse rsUpdate = session.apply(update);
                     if (rsUpdate.hasRowError()) {
-                        System.out.println(mid);
-                        System.out.println(rsUpdate.getRowError());
+                        System.out.println("UUUUUUUUUUUUUUUUUUUUUUrs update error" + rsUpdate.getRowError());
                     }
+                } else {
+                    System.out.println("IIIIIIIIIIIIIIIIIIIIIII insert error"+rsInsert.getRowError());
                 }
-                System.out.println(mid);
-                System.out.println(rsInsert.getRowError());
+
             }
-            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$insert date : "+rsInsert);
+            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$insert date : " + rsInsert);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void checkSession() {
-        if (session.isClosed()){
-            System.out.println("#################client is :" +client);
-            if (StringUtils.isNotEmpty(client.toString())){
+        if (session.isClosed()) {
+            System.out.println("#################client is :" + client);
+            if (StringUtils.isNotEmpty(client.toString())) {
                 try {
                     table = client.openTable(tablename);
                     session = client.newSession();
                     // 1 hours
-                    session.setTimeoutMillis(1000*60*60);
+                    session.setTimeoutMillis(1000 * 60 * 60);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
