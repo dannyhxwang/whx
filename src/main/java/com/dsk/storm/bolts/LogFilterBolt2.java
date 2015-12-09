@@ -61,6 +61,7 @@ public class LogFilterBolt2 extends BaseRichBolt {
             String[] items = line.split(",");
             if (items.length != 10) {
                 System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$error line：" + line);
+                this.collector.ack(tuple);
                 return;
             }
             String uid = items[0];
