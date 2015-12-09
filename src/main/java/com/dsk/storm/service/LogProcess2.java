@@ -24,11 +24,11 @@ public class LogProcess2 {
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         TopologyBuilder builder = new TopologyBuilder();
         BrokerHosts hosts = new ZkHosts(Constants.ZOOKEEPER_LIST);
-        String zkRoot = "/" + "test";
+        String zkRoot = "/" + Constants.TOPIC;
         String id = UUID.randomUUID().toString();
-        SpoutConfig spoutConfig = new SpoutConfig(hosts, "test", zkRoot, id);
+        SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC, zkRoot, id);
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-        //spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+        spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("spout1", new KafkaSpout(spoutConfig));
         builder.setBolt("bolt1", new LogFilterBolt2(), 10).shuffleGrouping("spout1");
