@@ -62,7 +62,7 @@ public class LogFilterBolt2 extends BaseRichBolt {
             //primary key of tables
             String mid = StringOperator.encryptByMd5(uid + sid);
             insertUpdate(Constants.UPUSERS_ATTR_TABLE, mid, Constants.ATTR_FIELDS, items);
-            insertUpdate(Constants.UPUSERS_DAYS_TABLE, mid, Constants.DAYS_FIELDS, Arrays.asList(items[9]).toArray(new String[1]));
+            insert(Constants.UPUSERS_DAYS_TABLE, mid, Constants.DAYS_FIELDS, Arrays.asList(items[9]).toArray(new String[1]));
             this.collector.ack(tuple);
         } catch (Exception e) {
             this.collector.reportError(e);
@@ -111,6 +111,36 @@ public class LogFilterBolt2 extends BaseRichBolt {
                 }
             } else {
                 System.out.println("=======================================INSERT DATA:" + mid + ":" + Arrays.toString(fieldsValue));
+            }
+        } catch (Exception e) {
+            collector.reportError(e);
+        }
+    }
+
+    /**
+     * 单纯插入
+     * @param tablename
+     * @param mid
+     * @param fields
+     * @param fieldsValue
+     */
+    private void insert(String tablename, String mid, String[] fields, String[] fieldsValue) {
+
+        checkSession();
+
+        KuduTable table;
+        if (Constants.UPUSERS_ATTR_TABLE.equals(tablename)) {
+            table = table_attr;
+        } else {
+            table = table_days;
+        }
+        try {
+            Insert insert = table.newInsert();
+            PartialRow row = insert.getRow();
+            setOpValue(mid, fields, fieldsValue, row);
+            OperationResponse rsInsert = session.apply(insert);
+            if (rsInsert.hasRowError()) {
+                System.out.println(rsInsert.getRowError().getMessage());
             }
         } catch (Exception e) {
             collector.reportError(e);
