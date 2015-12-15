@@ -33,6 +33,7 @@ public class RequestCount {
         TridentKafkaConfig tridentKafkaConfig =
                 new TridentKafkaConfig(hosts, Constants.TOPIC_REQUEST_COUNT, UUID.randomUUID().toString());
         tridentKafkaConfig.startOffsetTime= kafka.api.OffsetRequest.EarliestTime();
+        tridentKafkaConfig.ignoreZkOffsets=true;
         tridentKafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         TransactionalTridentKafkaSpout tridentKafkaSpout = new TransactionalTridentKafkaSpout(tridentKafkaConfig);
 
