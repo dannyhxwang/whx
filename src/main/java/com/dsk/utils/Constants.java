@@ -18,7 +18,7 @@ public class Constants {
 
     //storm
     public static final String TOPIC = "test_upusers";
-    public static final String TOPIC_REQUEST_COUNT = "test";
+    public static final String TOPIC_REQUEST_COUNT = "test_request_count";
 //    public static final String TOPIC = "test";
     public static final String GROUP_ID = "TEST";
 
