@@ -17,10 +17,13 @@ public class Constants {
 
     //storm
     public static final String TOPIC = "test_upusers";
+    public static final String TOPIC_REQUEST_COUNT = "test_request_count";
 //    public static final String TOPIC = "test";
     public static final String GROUP_ID = "TEST";
 
     //kafka
     public static final String ENCODER = "kafka.serializer.StringEncoder";
     public static final String BROKER_LIST = "namenode:9092,datanode1:9092,datanode4:9092";
+
+
 }
