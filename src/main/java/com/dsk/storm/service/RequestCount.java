@@ -27,7 +27,7 @@ import java.util.UUID;
  * Time: 10:10
  */
 public class RequestCount {
-    public static void main(String args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
+    public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         // create TransactionalTridentKafkaSpout
         BrokerHosts hosts = new ZkHosts(Constants.ZOOKEEPER_LIST);
         TridentKafkaConfig tridentKafkaConfig =
