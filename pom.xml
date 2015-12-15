@@ -115,12 +115,12 @@
             <version>2.1.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>redis.embedded</groupId>
-            <artifactId>embedded-redis</artifactId>
-            <version>0.1</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>redis.embedded</groupId>-->
+            <!--<artifactId>embedded-redis</artifactId>-->
+            <!--<version>0.1</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
     </dependencies>
     <build>
