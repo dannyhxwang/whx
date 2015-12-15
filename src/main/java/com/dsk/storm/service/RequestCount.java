@@ -39,10 +39,10 @@ public class RequestCount {
         // count request
         TridentTopology topology = new TridentTopology();
         Stream test = topology.newStream(Constants.TOPIC_REQUEST_COUNT, tridentKafkaSpout)
-                .each(new Fields("str"), new RequestCountETL(), new Fields("count"))
-                .groupBy(new Fields("count"))
-                .aggregate(new Fields("count"),new Count(), new Fields("result"))
-                .each(new PrintFunction(),new Fields("print"));
+                .each(new Fields("str"), new RequestCountETL(), new Fields("word"))
+                .groupBy(new Fields("word"))
+                .aggregate(new Fields("word"),new Count(), new Fields("count"))
+                .each(new Fields("word","count"),new PrintFunction(),new Fields("print"));
 
         Config conf = new Config();
         conf.setNumWorkers(1);
