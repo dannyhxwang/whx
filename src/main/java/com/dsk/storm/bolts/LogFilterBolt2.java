@@ -61,8 +61,8 @@ public class LogFilterBolt2 extends BaseRichBolt {
             String sid = items[2];
             //primary key of tables
             String mid = StringOperator.encryptByMd5(uid + sid);
-            insertUpdate(Constants.UPUSERS_ATTR_TABLE, mid, Constants.ATTR_FIELDS, items);
-            insert(Constants.UPUSERS_DAYS_TABLE, mid, Constants.DAYS_FIELDS, Arrays.asList(items[9]).toArray(new String[1]));
+            insertUpdate(Constants.UPUSERS_ATTR_TABLE, mid, items);
+            insert(Constants.UPUSERS_DAYS_TABLE, mid, Arrays.asList(items[9]).toArray(new String[1]));
             this.collector.ack(tuple);
         } catch (Exception e) {
             this.collector.reportError(e);
@@ -77,10 +77,9 @@ public class LogFilterBolt2 extends BaseRichBolt {
      * 执行插入更新操作
      * @param tablename
      * @param mid
-     * @param fields
      * @param fieldsValue
      */
-    private void insertUpdate(String tablename, String mid, String[] fields, String[] fieldsValue) {
+    private void insertUpdate(String tablename, String mid, String[] fieldsValue) {
 
         checkSession();
 
@@ -93,13 +92,13 @@ public class LogFilterBolt2 extends BaseRichBolt {
         try {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
-            setOpValue(mid, fields, fieldsValue, row);
+            setInsertValue(mid, Constants.ATTR_INSERT_FIELDS, fieldsValue, row);
             OperationResponse rsInsert = session.apply(insert);
             if (rsInsert.hasRowError()) {
                 if ("key already present".equals(rsInsert.getRowError().getMessage())) {
                     Update update = table.newUpdate();
                     PartialRow urow = update.getRow();
-                    setOpValue(mid, fields, fieldsValue, urow);
+                    setUpdateValue(mid, Constants.ATTR_UPDATE_FIELDS, fieldsValue, urow);
                     OperationResponse rsUpdate = session.apply(update);
                     if (rsUpdate.hasRowError()) {
                         System.out.println("=======================================ERROR UPDATE :" + rsUpdate.getRowError());
@@ -121,10 +120,9 @@ public class LogFilterBolt2 extends BaseRichBolt {
      * 单纯插入
      * @param tablename
      * @param mid
-     * @param fields
      * @param fieldsValue
      */
-    private void insert(String tablename, String mid, String[] fields, String[] fieldsValue) {
+    private void insert(String tablename, String mid, String[] fieldsValue) {
 
         checkSession();
 
@@ -137,7 +135,7 @@ public class LogFilterBolt2 extends BaseRichBolt {
         try {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
-            setOpValue(mid, fields, fieldsValue, row);
+            setInsertValue(mid, Constants.DAYS_FIELDS, fieldsValue, row);
             OperationResponse rsInsert = session.apply(insert);
             if (rsInsert.hasRowError()) {
                 System.out.println("=======================================INSERT DATA:"+mid+"---------------"+
@@ -178,11 +176,20 @@ public class LogFilterBolt2 extends BaseRichBolt {
      * @param fieldsValue
      * @param row
      */
-    private void setOpValue(String mid, String[] fields, String[] fieldsValue, PartialRow row) {
+    private void setInsertValue(String mid, String[] fields, String[] fieldsValue, PartialRow row) {
         row.addString("mid", mid);
         for (int i = 0; i < fields.length; i++) {
             row.addString(fields[i], fieldsValue[i]);
         }
+    }
+
+    private void setUpdateValue(String mid, String[] fields, String[] fieldsValue, PartialRow row) {
+        row.addString("mid", mid);
+        int i = 0;
+        for (; i < fields.length-1; i++) {
+            row.addString(fields[i], fieldsValue[i]);
+        }
+        row.addString(fields[i], fieldsValue[i+1]);
     }
 
     @Override

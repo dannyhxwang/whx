@@ -12,7 +12,8 @@ public class Constants {
     public static final String UPUSERS_ATTR_TABLE = "upusers_attr_kudu_test";
     public static final String UPUSERS_DAYS_TABLE = "upusers_days_kudu_test";
 
-    public static final String[] ATTR_FIELDS = {"uid", "ptid", "sid", "n", "ln", "ver", "pid", "geoip_n", "first_date", "last_date"};
+    public static final String[] ATTR_INSERT_FIELDS = {"uid", "ptid", "sid", "n", "ln", "ver", "pid", "geoip_n", "first_date", "last_date"};
+    public static final String[] ATTR_UPDATE_FIELDS = {"uid", "ptid", "sid", "n", "ln", "ver", "pid", "geoip_n", "last_date"};
     public static final String[] DAYS_FIELDS= {"day"};
 
     //storm
