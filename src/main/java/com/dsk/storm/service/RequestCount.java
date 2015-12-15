@@ -40,8 +40,8 @@ public class RequestCount {
         Stream test = topology.newStream(Constants.TOPIC_REQUEST_COUNT, tridentKafkaSpout)
                 .each(new Fields("str"), new RequestCountETL(), new Fields("count"))
                 .groupBy(new Fields("count"))
-                .aggregate(new Count(), new Fields("result"))
-                .each(new Fields("result"),new PrintFunction(),new Fields("print"));
+                .aggregate(new Fields("count"),new Count(), new Fields("result"))
+                .each(new PrintFunction(),new Fields("print"));
 
         Config conf = new Config();
         conf.setNumWorkers(1);
