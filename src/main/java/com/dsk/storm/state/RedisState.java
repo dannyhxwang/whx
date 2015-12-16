@@ -25,12 +25,14 @@ import java.util.*;
 public class RedisState<T> implements IBackingMap<T> {
     private static final Logger logger = LoggerFactory.getLogger(RedisState.class);
 
+    // transaction method
     private static final EnumMap<StateType, Serializer> DEFAULT_SERIALIZERS = Maps.newEnumMap(ImmutableMap.of(
             StateType.NON_TRANSACTIONAL, new JSONNonTransactionalSerializer(),
             StateType.TRANSACTIONAL, new JSONTransactionalSerializer(),
             StateType.OPAQUE, new JSONOpaqueSerializer()
     ));
 
+    // get single key
     public static class DefaultKeyFactory implements KeyFactory {
         public String build(List<Object> key) {
             if (key.size() != 1)
@@ -38,13 +40,16 @@ public class RedisState<T> implements IBackingMap<T> {
             return (String) key.get(0);
         }
     }
-
-    ;
+    public static interface KeyFactory extends Serializable {
+        String build(List<Object> key);
+    }
 
     public static class Options<T> implements Serializable {
+        // trident conf ?
         public int localCacheSize = 1000;
         public String globalKey = "$REDIS-MAP-STATE-GLOBAL";
         public Serializer<T> serializer = null;
+        // redis conf
         public KeyFactory keyFactory = null;
         public int connectionTimeout = Protocol.DEFAULT_TIMEOUT;
         public String password = null;
@@ -52,9 +57,7 @@ public class RedisState<T> implements IBackingMap<T> {
         public String hkey = null;
     }
 
-    public static interface KeyFactory extends Serializable {
-        String build(List<Object> key);
-    }
+
 
     public static StateFactory opaque(InetSocketAddress server) {
         return opaque(server, new Options());
@@ -78,7 +81,9 @@ public class RedisState<T> implements IBackingMap<T> {
         return transactional(server, new Options());
     }
 
+    // main server location , redis hashmap key
     public static StateFactory transactional(InetSocketAddress server, String hkey) {
+        // conf
         Options opts = new Options();
         opts.hkey = hkey;
         return transactional(server, opts);
@@ -116,7 +121,7 @@ public class RedisState<T> implements IBackingMap<T> {
         Serializer serializer;
         KeyFactory factory;
         Options options;
-
+        // conf
         public Factory(InetSocketAddress server, StateType type, Options options, KeyFactory factory) {
             this.type = type;
             this.server = server;

@@ -1,14 +1,15 @@
 package com.dsk.storm.service;
 
 import backtype.storm.Config;
-import backtype.storm.StormSubmitter;
+import backtype.storm.LocalCluster;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.tuple.Fields;
 import com.dsk.storm.function.RequestCountETL;
-import com.dsk.storm.state.RedisState;
+import com.dsk.storm.state.KuduState;
+import com.dsk.storm.state.KuduStateConfig;
 import com.dsk.utils.Constants;
 import storm.kafka.BrokerHosts;
 import storm.kafka.StringScheme;
@@ -20,7 +21,6 @@ import storm.trident.TridentTopology;
 import storm.trident.operation.builtin.Count;
 import storm.trident.state.StateFactory;
 
-import java.net.InetSocketAddress;
 import java.util.UUID;
 
 /**
@@ -38,8 +38,12 @@ public class RequestCount {
         tridentKafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         TransactionalTridentKafkaSpout tridentKafkaSpout = new TransactionalTridentKafkaSpout(tridentKafkaConfig);
 
-        // state
-        StateFactory state = RedisState.transactional(new InetSocketAddress("namenode", 6379), Constants.TOPIC_REQUEST_COUNT);
+        // Redis state
+        //StateFactory state = RedisState.transactional(new InetSocketAddress("namenode", 6379), Constants.TOPIC_REQUEST_COUNT);
+        KuduStateConfig config  = new KuduStateConfig();
+        config.setTableName("test_word_count");
+        config.setKeyColumns(new String[]{"word","count"});
+        StateFactory state = (StateFactory) new KuduState(config);
         // count request
         TridentTopology topology = new TridentTopology();
         TridentState test = topology.newStream(Constants.TOPIC_REQUEST_COUNT, tridentKafkaSpout)
@@ -51,6 +55,8 @@ public class RequestCount {
 
         Config conf = new Config();
         conf.setNumWorkers(1);
-        StormSubmitter.submitTopologyWithProgressBar(Constants.TOPIC_REQUEST_COUNT, conf, topology.build());
+        LocalCluster cluster = new LocalCluster();
+        cluster.submitTopology("test_state",conf,topology.build());
+        //StormSubmitter.submitTopologyWithProgressBar(Constants.TOPIC_REQUEST_COUNT, conf, topology.build());
     }
 }

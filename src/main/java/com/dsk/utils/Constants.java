@@ -27,4 +27,7 @@ public class Constants {
     public static final String BROKER_LIST = "namenode:9092,datanode1:9092,datanode4:9092";
 
 
+    // state
+    public static final int DEFAULT_CACHE_SIZE = 10000;
+    public static final int DEFAULT_BATCH_SIZE = 10000;
 }
