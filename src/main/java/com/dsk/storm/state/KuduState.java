@@ -1,13 +1,19 @@
 package com.dsk.storm.state;
 
 import backtype.storm.task.IMetricsContext;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.kududb.client.KuduClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import storm.trident.state.OpaqueValue;
 import storm.trident.state.State;
 import storm.trident.state.StateFactory;
+import storm.trident.state.TransactionalValue;
 import storm.trident.state.map.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +37,14 @@ public class KuduState<T> implements IBackingMap<T> {
 
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
-        System.out.println("gggggggggggggggggggggkeys"+keys);
-        return null;
+        return Lists.transform(keys, new Function<List<Object>, T>() {
+                    @Override
+                    public T apply(List<Object> input) {
+                        return null;
+                    }
+                }
+
+        )
     }
 
     @Override

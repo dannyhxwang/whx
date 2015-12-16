@@ -1,7 +1,6 @@
 package com.dsk.storm.service;
 
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.AuthorizationException;
@@ -9,8 +8,7 @@ import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.tuple.Fields;
 import com.dsk.storm.function.RequestCountETL;
-import com.dsk.storm.state.KuduState;
-import com.dsk.storm.state.KuduStateConfig;
+import com.dsk.storm.state.KuduState2;
 import com.dsk.utils.Constants;
 import storm.kafka.BrokerHosts;
 import storm.kafka.StringScheme;
@@ -41,10 +39,7 @@ public class RequestCount {
 
         // Redis state
         //StateFactory state = RedisState.transactional(new InetSocketAddress("namenode", 6379), Constants.TOPIC_REQUEST_COUNT);
-        KuduStateConfig config  = new KuduStateConfig();
-        config.setTableName("test_word_count");
-        config.setKeyColumns(new String[]{"word","count"});
-        StateFactory state = new KuduState(config).newFactory(config);
+        StateFactory state = KuduState2.transactional("namenode");
         // count request
         TridentTopology topology = new TridentTopology();
         TridentState test = topology.newStream(Constants.TOPIC_REQUEST_COUNT, tridentKafkaSpout)
@@ -56,7 +51,7 @@ public class RequestCount {
 
         Config conf = new Config();
         conf.setNumWorkers(1);
-        LocalCluster cluster = new LocalCluster();
+        //LocalCluster cluster = new LocalCluster();
         //cluster.submitTopology("test_state",conf,topology.build());
         StormSubmitter.submitTopologyWithProgressBar(Constants.TOPIC_REQUEST_COUNT, conf, topology.build());
     }
