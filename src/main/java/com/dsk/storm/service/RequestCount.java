@@ -56,7 +56,7 @@ public class RequestCount {
         Config conf = new Config();
         conf.setNumWorkers(1);
         LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("test_state",conf,topology.build());
-        //StormSubmitter.submitTopologyWithProgressBar(Constants.TOPIC_REQUEST_COUNT, conf, topology.build());
+        //cluster.submitTopology("test_state",conf,topology.build());
+        StormSubmitter.submitTopologyWithProgressBar(Constants.TOPIC_REQUEST_COUNT, conf, topology.build());
     }
 }
