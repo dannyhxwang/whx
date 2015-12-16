@@ -43,7 +43,7 @@ public class RequestCount {
         KuduStateConfig config  = new KuduStateConfig();
         config.setTableName("test_word_count");
         config.setKeyColumns(new String[]{"word","count"});
-        StateFactory state = (StateFactory) new KuduState(config);
+        StateFactory state = new KuduState(config).newFactory(config);
         // count request
         TridentTopology topology = new TridentTopology();
         TridentState test = topology.newStream(Constants.TOPIC_REQUEST_COUNT, tridentKafkaSpout)
