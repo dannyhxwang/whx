@@ -2,6 +2,8 @@ package com.dsk.storm.state;
 
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import org.kududb.client.Insert;
 import org.kududb.client.KuduClient;
@@ -11,7 +13,7 @@ import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +42,29 @@ public class KuduState2<T> implements IBackingMap<T> {
         public String rowKey = "row_key";
     }
 
+    private Collection<String> toColumnNames(List<List<Object>> keys) {
+        return Collections2.transform(keys, new Function<List<Object>, String>() {
+            @Override
+            public String apply(List<Object> key) {
+                return toColumnName(key);
+            }
+        });
+    }
+
+    private String toColumnName(List<Object> key) {
+        StringBuffer sb = new StringBuffer();
+        for (Object obj : key) {
+            sb.append(obj);
+        }
+
+        return sb.toString();
+    }
+
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
-        return Collections.emptyList();
+        System.out.println("-----------keys.size()"+keys.size());
+        System.out.println("-----------keys"+keys);
+        return (List<T>) keys.get(0);
     }
 
     @Override
