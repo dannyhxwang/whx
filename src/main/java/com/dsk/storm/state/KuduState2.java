@@ -4,6 +4,7 @@ import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.kududb.client.Insert;
 import org.kududb.client.KuduClient;
@@ -32,7 +33,7 @@ public class KuduState2<T> implements IBackingMap<T> {
     }
 
     public static class Options<T> implements Serializable {
-        public int localCacheSize = 10000;
+        public int localCacheSize = 1000;
         public String globalKey = "$KUDU__GLOBAL_KEY__$";
         public Serializer<T> serializer = null;
         public String tablename = "test_wordcount";
@@ -63,8 +64,15 @@ public class KuduState2<T> implements IBackingMap<T> {
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
         System.out.println("-----------keys.size()"+keys.size());
-        System.out.println("-----------keys"+keys);
-        return (List<T>) keys.get(0);
+        List<T> slist = Lists.newArrayList();
+        for (List<Object> lobj : keys){
+            for (Object obj : lobj){
+                System.out.println("-------------all keys:"+obj);
+                slist.add((T)obj);
+            }
+        }
+
+        return slist;
     }
 
     @Override
