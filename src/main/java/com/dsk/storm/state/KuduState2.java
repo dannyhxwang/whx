@@ -10,10 +10,8 @@ import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * User: yanbit
@@ -30,7 +28,7 @@ public class KuduState2<T> implements IBackingMap<T> {
     }
 
     public static class Options<T> implements Serializable {
-        public int localCacheSize = 5000;
+        public int localCacheSize = 1000;
         public String globalKey = "$KUDU__GLOBAL_KEY__$";
         public Serializer<T> serializer = null;
         public String tablename = "test_request_count";
@@ -38,19 +36,25 @@ public class KuduState2<T> implements IBackingMap<T> {
 
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
+
+        System.out.println("---------------multiGet start--------------" +
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()));
         if (keys.size() == 0) {
             return Collections.emptyList();
         }
-
 
         System.out.println("-----------keys.size()" + keys.size());
         List<String> allkeys = getAllKeys(keys);
         List<String> values = getAllValues(allkeys);
 
+        System.out.println("---------------multiGet end--------------" +
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()));
         return deserializeValues(keys, values);
     }
 
     private List<String> getAllValues(List<String> keys) {
+        System.out.println("---------------get all value start--------------" +
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()));
         ArrayList<String> values = Lists.newArrayList();
         try {
             KuduTable table = kuduClient.openTable(options.tablename);
@@ -84,6 +88,8 @@ public class KuduState2<T> implements IBackingMap<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("---------------get all value end--------------" +
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()));
         return values;
     }
 
@@ -114,6 +120,8 @@ public class KuduState2<T> implements IBackingMap<T> {
 
     @Override
     public void multiPut(List<List<Object>> keys, List<T> vals) {
+        System.out.println("---------------multiPut start--------------" +
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()));
         if (keys.size() == 0) {
             return;
         }
@@ -156,6 +164,8 @@ public class KuduState2<T> implements IBackingMap<T> {
                 e.printStackTrace();
             }
         }
+        System.out.println("---------------multiPut end--------------" +
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()));
     }
 
     //
