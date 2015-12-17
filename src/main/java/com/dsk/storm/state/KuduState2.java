@@ -10,10 +10,7 @@ import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: yanbit
@@ -74,8 +71,8 @@ public class KuduState2<T> implements IBackingMap<T> {
                     RowResultIterator results = scanner.nextRows();
                     while (results.hasNext()) {
                         RowResult result = results.next();
-                        System.out.println(result.getString("value"));
-                        values.add(result.getString("value") == null ? null: result.getString("value"));
+                        System.out.println("======================get all value "+result.getString("value"));
+                        values.add(result.getString("value") == null ? null : result.getString("value"));
                     }
                 }
             }
@@ -83,6 +80,7 @@ public class KuduState2<T> implements IBackingMap<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.printf("=====================end all value "+ values.toString());
         return values;
     }
 
@@ -92,9 +90,7 @@ public class KuduState2<T> implements IBackingMap<T> {
             if (key.size() != 1){
                 throw new RuntimeException("Default KeyFactory does not support compound keys");
             }
-            System.out.println("------------all keys start"+key.get(0));
             values.add((String) key.get(0));
-            System.out.println("------------all keys end"+key.get(0));
         }
         return values;
     }
@@ -111,6 +107,7 @@ public class KuduState2<T> implements IBackingMap<T> {
             }
         }
         System.out.println("------------deserialize value end ");
+        System.out.println("------------deserialize value values "+result.toString());
         return result;
     }
 
