@@ -162,12 +162,13 @@ public class KuduState2<T> implements IBackingMap<T> {
     private KuduClient kuduClient;
     private Options<T> options;
     private Serializer<T> serializer;
-    private KuduSession session = kuduClient.newSession();
+    private KuduSession session;
 
     public KuduState2(String hosts, Options<T> options, Serializer<T> serializer) {
         kuduClient = new KuduClient.KuduClientBuilder(hosts).build();
         this.options = options;
         this.serializer = serializer;
+        this.session = kuduClient.newSession();
     }
 
     // factory
