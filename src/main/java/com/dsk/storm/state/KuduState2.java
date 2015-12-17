@@ -33,7 +33,7 @@ public class KuduState2<T> implements IBackingMap<T> {
         public int localCacheSize = 1000;
         public String globalKey = "$KUDU__GLOBAL_KEY__$";
         public Serializer<T> serializer = null;
-        public String tablename = "test_wordcount";
+        public String tablename = "test_request_count";
     }
 
     @Override
