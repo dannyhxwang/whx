@@ -3,7 +3,9 @@ package com.dsk.storm.state;
 import org.kududb.Schema;
 import org.kududb.client.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,16 +15,17 @@ import java.util.List;
  */
 public class KuduTest {
     public static void main(String[] args) throws Exception {
-        String table = "my_first_table";
-        KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
-        KuduTable t = client.openTable(table);
-        Update update = t.newUpdate();
-        PartialRow row = update.getRow();
-        row.addLong(0,10);
-        row.addString(1,"11111111111111111");
-        KuduSession session=client.newSession();
-        session.apply(update);
-        client.shutdown();
+//        String table = "my_first_table";
+//        KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
+//        KuduTable t = client.openTable(table);
+//        Update update = t.newUpdate();
+//        PartialRow row = update.getRow();
+//        row.addLong(0,10);
+//        row.addString(1,"11111111111111111");
+//        KuduSession session=client.newSession();
+//        session.apply(update);
+//        client.shutdown();
+        System.out.println(new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
     }
 
     public void  test() throws Exception {
