@@ -185,7 +185,9 @@ public class RedisState<T> implements IBackingMap<T> {
         } else {
             Map<byte[], byte[]> keyValue = hgetAll(this.options.hkey.getBytes());
             List<String> values = buildValuesFromMap(keys, keyValue);
-            return deserializeValues(keys, values);
+            List<T> list = deserializeValues(keys, values);
+            System.out.println("=========================list =================="+list.toString());
+            return list;
         }
     }
 

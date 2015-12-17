@@ -8,7 +8,7 @@ import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.tuple.Fields;
 import com.dsk.storm.function.RequestCountETL;
-import com.dsk.storm.state.KuduState2;
+import com.dsk.storm.state.RedisState;
 import com.dsk.utils.Constants;
 import storm.kafka.BrokerHosts;
 import storm.kafka.StringScheme;
@@ -20,6 +20,7 @@ import storm.trident.TridentTopology;
 import storm.trident.operation.builtin.Count;
 import storm.trident.state.StateFactory;
 
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 /**
@@ -38,8 +39,8 @@ public class RequestCount {
         TransactionalTridentKafkaSpout tridentKafkaSpout = new TransactionalTridentKafkaSpout(tridentKafkaConfig);
 
         // Redis state
-        //StateFactory state = RedisState.transactional(new InetSocketAddress("namenode", 6379), Constants.TOPIC_REQUEST_COUNT);
-        StateFactory state = KuduState2.transactional("namenode");
+        StateFactory state = RedisState.transactional(new InetSocketAddress("namenode", 6379), Constants.TOPIC_REQUEST_COUNT);
+        //StateFactory state = KuduState2.transactional("namenode");
         // count request
         TridentTopology topology = new TridentTopology();
         TridentState test = topology.newStream(Constants.TOPIC_REQUEST_COUNT, tridentKafkaSpout)
