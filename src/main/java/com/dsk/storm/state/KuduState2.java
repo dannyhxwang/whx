@@ -12,6 +12,7 @@ import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,9 +39,28 @@ public class KuduState2<T> implements IBackingMap<T> {
 
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
-        System.out.println("-----------keys.size()"+keys.size());
+        if (keys.size()==0){
+            return Collections.emptyList();
+        }
+
+//        Map<byte[], byte[]> keyValue = hgetAll(this.options.hkey.getBytes()); get all keys
+//        List<String> values = buildValuesFromMap(keys, keyValue); get values by keys
+//        private List<String> buildValuesFromMap(List<List<Object>> keys, Map<byte[], byte[]> keyValue) {
+//            List<String> values = new ArrayList<String>(keys.size());
+//            for (List<Object> key : keys) {
+//                String strKey = keyFactory.build(key);
+//                byte[] bytes = keyValue.get(strKey.getBytes());
+//                values.add(bytes == null ? null : new String(bytes));
+//            }
+//            return values;
+//        }
+//        return deserializeValues(keys, values);
+
+        ///////////////////////////////
+        System.out.println("-----------keys.size()" + keys.size());
         List<T> slist = Lists.newArrayList();
         for (List<Object> lobj : keys){
+            System.out.println("-----------lobj---------keys.size()"+lobj.size());
             for (Object obj : lobj){
                 System.out.println("-------------all keys:"+obj);
                 slist.add((T)obj);
