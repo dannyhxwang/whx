@@ -67,14 +67,15 @@ public class KuduState2<T> implements IBackingMap<T> {
                         .exclusiveUpperBound(end)
                         .setProjectedColumnNames(cols)
                         .build();
+                String value = null;
                 while (scanner.hasMoreRows()) {
                     RowResultIterator results = scanner.nextRows();
                     while (results.hasNext()) {
                         RowResult result = results.next();
-                        System.out.println("======================get all value "+result.getString("value"));
-                        values.add(result.getString("value") == null ? null : result.getString("value"));
+                        value = result.getString("value");
                     }
                 }
+                values.add(value);
             }
 
         } catch (Exception e) {

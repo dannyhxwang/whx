@@ -15,26 +15,35 @@ public class KuduTest {
     public static void main(String[] args) throws Exception {
         String table = "my_first_table";
         List<String> cols = new ArrayList<String>();
-        cols.add("value");
+        cols.add("name");
         KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
         KuduTable t = client.openTable(table);
         Schema s = t.getSchema();
         PartialRow start  = s.newPartialRow();
-        start.addLong("key",0);
+        start.addLong("id", 10);
         PartialRow end = s.newPartialRow();
-        end.addLong("key",1);
+        end.addLong("id",11);
         KuduScanner scanner = client.newScannerBuilder(t)
                 .lowerBound(start)
                 .exclusiveUpperBound(end)
                 .setProjectedColumnNames(cols)
                 .build();
+        String v =null;
         while (scanner.hasMoreRows()) {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
+                System.out.println("--------------");
                 RowResult result = results.next();
-                System.out.println(result.getString("value"));
+                v=result.getString("name");
+//                if (Strings.isNotEmpty(result.getString("name"))){
+//                    v=result.getString("name");
+//                }else {
+//                    System.out.println("empty");
+//                }
             }
         }
+        System.out.println(v);
+
 
         client.shutdown();
     }
