@@ -48,7 +48,7 @@ public class KuduState2<T> implements IBackingMap<T> {
         List<String> allkeys = getAllKeys(keys);
         List<String> values = getAllValues(allkeys);
 
-        return deserializeValues(keys, list);
+        return deserializeValues(keys, values);
     }
 
     private List<String> getAllValues(List<String> keys) {
