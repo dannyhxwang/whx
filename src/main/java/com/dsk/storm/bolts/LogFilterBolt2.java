@@ -29,9 +29,12 @@ public class LogFilterBolt2 extends BaseRichBolt {
         this.collector = outputCollector;
         client = new KuduClient.KuduClientBuilder(Constants.KUDU_MASTER).build();
         try {
-            table_attr = client.openTable(Constants.UPUSERS_ATTR_TABLE);
-            table_days = client.openTable(Constants.UPUSERS_DAYS_TABLE);
-            session = client.newSession();
+            this.table_attr = client.openTable(Constants.UPUSERS_ATTR_TABLE);
+            this.table_days = client.openTable(Constants.UPUSERS_DAYS_TABLE);
+            this.session = client.newSession();
+            this.session.setMutationBufferSpace(32*1024*1024);
+            this.session.setTimeoutMillis(60*1000);
+            this.session.setFlushMode(KuduSession.FlushMode.AUTO_FLUSH_BACKGROUND);
         } catch (Exception e) {
             e.printStackTrace();
         }
