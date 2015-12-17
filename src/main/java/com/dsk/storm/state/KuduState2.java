@@ -2,8 +2,6 @@ package com.dsk.storm.state;
 
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.kududb.client.Insert;
@@ -14,7 +12,6 @@ import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -37,28 +34,6 @@ public class KuduState2<T> implements IBackingMap<T> {
         public String globalKey = "$KUDU__GLOBAL_KEY__$";
         public Serializer<T> serializer = null;
         public String tablename = "test_wordcount";
-        public int replicationFactor = 1;
-        public String keyspace = "test";
-        public String columnFamily = "column_family";
-        public String rowKey = "row_key";
-    }
-
-    private Collection<String> toColumnNames(List<List<Object>> keys) {
-        return Collections2.transform(keys, new Function<List<Object>, String>() {
-            @Override
-            public String apply(List<Object> key) {
-                return toColumnName(key);
-            }
-        });
-    }
-
-    private String toColumnName(List<Object> key) {
-        StringBuffer sb = new StringBuffer();
-        for (Object obj : key) {
-            sb.append(obj);
-        }
-
-        return sb.toString();
     }
 
     @Override
@@ -85,7 +60,7 @@ public class KuduState2<T> implements IBackingMap<T> {
             for (int i = 0; i < keys.size(); i++) {
                 List<Object> list = keys.get(i);
                 for (Object  obj : list){
-                    System.out.println("----------------------------------------"+obj);
+                    System.out.println("------------------------put keys"+obj);
                 }
 //                Composite columnName = toColumnName(keys.get(i));
 //                byte[] bytes = serializer.serialize(values.get(i));
