@@ -43,7 +43,6 @@ public class KuduState2<T> implements IBackingMap<T> {
             return Collections.emptyList();
         }
 
-        System.out.println("-----------keys.size()" + keys.size());
         List<String> allkeys = getAllKeys(keys);
         List<String> values = getAllValues(allkeys);
 
@@ -57,7 +56,6 @@ public class KuduState2<T> implements IBackingMap<T> {
                 new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
         ArrayList<String> values = Lists.newArrayList();
         try {
-            kuduClient.newScannerBuilder(table);
             List<String> cols = new ArrayList<String>();
             cols.add("value");
             KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
@@ -153,6 +151,7 @@ public class KuduState2<T> implements IBackingMap<T> {
                     System.out.println("=======================================INSERT DATA:" + key + ":" + val);
                 }
             } catch (Exception e) {
+
                 e.printStackTrace();
             }
         }
@@ -172,6 +171,9 @@ public class KuduState2<T> implements IBackingMap<T> {
         this.options = options;
         this.serializer = serializer;
         this.session = kuduClient.newSession();
+        this.session.setMutationBufferSpace(32*1024*1024);
+        this.session.setTimeoutMillis(60*1000);
+        this.session.setFlushMode(KuduSession.FlushMode.AUTO_FLUSH_BACKGROUND);
         try {
             table = kuduClient.openTable(options.tablename);
         } catch (Exception e) {
@@ -222,17 +224,6 @@ public class KuduState2<T> implements IBackingMap<T> {
         }
     }
 
-    public static class DefaultKeyFactory implements KeyFactory {
-        public String build(List<Object> key) {
-            if (key.size() != 1)
-                throw new RuntimeException("Default KeyFactory does not support compound keys");
-            return (String) key.get(0);
-        }
-    }
-
-    public static interface KeyFactory extends Serializable {
-        public String build(List<Object> key);
-    }
 
     public static StateFactory opaque(String hosts) {
         return opaque(hosts, new Options<OpaqueValue>());
