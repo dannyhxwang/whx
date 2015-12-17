@@ -30,7 +30,7 @@ public class KuduState2<T> implements IBackingMap<T> {
     }
 
     public static class Options<T> implements Serializable {
-        public int localCacheSize = 1000;
+        public int localCacheSize = 5000;
         public String globalKey = "$KUDU__GLOBAL_KEY__$";
         public Serializer<T> serializer = null;
         public String tablename = "test_request_count";
@@ -39,11 +39,11 @@ public class KuduState2<T> implements IBackingMap<T> {
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
         if (keys.size() == 0) {
+            System.out.println("----------------keys.none");
             return Collections.emptyList();
         }
 
 
-        ///////////////////////////////
         System.out.println("-----------keys.size()" + keys.size());
         List<String> allkeys = getAllKeys(keys);
         List<String> values = getAllValues(allkeys);
@@ -121,10 +121,6 @@ public class KuduState2<T> implements IBackingMap<T> {
                 for (Object obj : list) {
                     System.out.println("------------------------put keys" + obj);
                 }
-//                Composite columnName = toColumnName(keys.get(i));
-//                byte[] bytes = serializer.serialize(values.get(i));
-//                HColumn<Composite, byte[]> column = HFactory.createColumn(columnName, bytes);
-//                mutator.insert(options.rowKey, options.columnFamily, column);
             }
         } catch (Exception e) {
             e.printStackTrace();
