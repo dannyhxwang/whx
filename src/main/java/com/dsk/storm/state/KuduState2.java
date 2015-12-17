@@ -84,7 +84,7 @@ public class KuduState2<T> implements IBackingMap<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return values;
     }
 
     private List<String> getAllKeys(List<List<Object>> keys) {
