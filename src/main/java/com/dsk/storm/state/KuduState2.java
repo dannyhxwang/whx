@@ -100,6 +100,7 @@ public class KuduState2<T> implements IBackingMap<T> {
         System.out.println("------------deserialize value start ");
         List<T> result = new ArrayList<T>(keys.size());
         for (String value : values) {
+            System.out.println("========================value=========="+value);
             if (value != null) {
                 result.add((T) serializer.deserialize(value.getBytes()));
             } else {
