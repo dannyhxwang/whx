@@ -4,14 +4,13 @@ import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.kududb.client.Insert;
-import org.kududb.client.KuduClient;
-import org.kududb.client.KuduSession;
-import org.kududb.client.KuduTable;
+import org.kududb.Schema;
+import org.kududb.client.*;
 import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,35 +38,75 @@ public class KuduState2<T> implements IBackingMap<T> {
 
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
-        if (keys.size()==0){
+        if (keys.size() == 0) {
             return Collections.emptyList();
         }
 
-//        Map<byte[], byte[]> keyValue = hgetAll(this.options.hkey.getBytes()); get all keys
-//        List<String> values = buildValuesFromMap(keys, keyValue); get values by keys
-//        private List<String> buildValuesFromMap(List<List<Object>> keys, Map<byte[], byte[]> keyValue) {
-//            List<String> values = new ArrayList<String>(keys.size());
-//            for (List<Object> key : keys) {
-//                String strKey = keyFactory.build(key);
-//                byte[] bytes = keyValue.get(strKey.getBytes());
-//                values.add(bytes == null ? null : new String(bytes));
-//            }
-//            return values;
-//        }
-//        return deserializeValues(keys, values);
 
         ///////////////////////////////
         System.out.println("-----------keys.size()" + keys.size());
-        List<T> slist = Lists.newArrayList();
-        for (List<Object> lobj : keys){
-            System.out.println("-----------lobj---------keys.size()"+lobj.size());
-            for (Object obj : lobj){
-                System.out.println("-------------all keys:"+obj);
-                slist.add((T)obj);
+        List<String> allkeys = getAllKeys(keys);
+        List<String> values = getAllValues(allkeys);
+
+        return deserializeValues(keys, list);
+    }
+
+    private List<String> getAllValues(List<String> keys) {
+        ArrayList<String> values = Lists.newArrayList();
+        try {
+            KuduTable table = kuduClient.openTable(options.tablename);
+            kuduClient.newScannerBuilder(table);
+            List<String> cols = new ArrayList<String>();
+            cols.add("value");
+            KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
+            Schema schema = table.getSchema();
+
+            for (String key : keys) {
+                PartialRow start = schema.newPartialRow();
+                start.addString("key", key);
+                PartialRow end = schema.newPartialRow();
+                end.addString("key", key + "1");
+                KuduScanner scanner = client.newScannerBuilder(table)
+                        .lowerBound(start)
+                        .exclusiveUpperBound(end)
+                        .setProjectedColumnNames(cols)
+                        .build();
+                while (scanner.hasMoreRows()) {
+                    RowResultIterator results = scanner.nextRows();
+                    while (results.hasNext()) {
+                        RowResult result = results.next();
+                        System.out.println(result.getString("value"));
+                        values.add(result.getString("value"));
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<String> getAllKeys(List<List<Object>> keys) {
+        List<String> values = new ArrayList<String>(keys.size());
+        for (List<Object> key : keys) {
+            if (key.size() != 1)
+                throw new RuntimeException("Default KeyFactory does not support compound keys");
+            values.add((String) key.get(0));
+        }
+        return values;
+    }
+
+    private List<T> deserializeValues(List<List<Object>> keys, List<String> values) {
+        List<T> result = new ArrayList<T>(keys.size());
+        for (String value : values) {
+            if (value != null) {
+                result.add((T) serializer.deserialize(value.getBytes()));
+            } else {
+                result.add(null);
             }
         }
-
-        return slist;
+        return result;
     }
 
     @Override
@@ -79,8 +118,8 @@ public class KuduState2<T> implements IBackingMap<T> {
             Insert insert = table.newInsert();
             for (int i = 0; i < keys.size(); i++) {
                 List<Object> list = keys.get(i);
-                for (Object  obj : list){
-                    System.out.println("------------------------put keys"+obj);
+                for (Object obj : list) {
+                    System.out.println("------------------------put keys" + obj);
                 }
 //                Composite columnName = toColumnName(keys.get(i));
 //                byte[] bytes = serializer.serialize(values.get(i));
@@ -102,6 +141,7 @@ public class KuduState2<T> implements IBackingMap<T> {
         this.options = options;
         this.serializer = serializer;
     }
+
     // factory
     protected static class Factory implements StateFactory {
         private StateType stateType;
@@ -143,6 +183,18 @@ public class KuduState2<T> implements IBackingMap<T> {
 
             return new SnapshottableMap(mapState, new Values(options.globalKey));
         }
+    }
+
+    public static class DefaultKeyFactory implements KeyFactory {
+        public String build(List<Object> key) {
+            if (key.size() != 1)
+                throw new RuntimeException("Default KeyFactory does not support compound keys");
+            return (String) key.get(0);
+        }
+    }
+
+    public static interface KeyFactory extends Serializable {
+        public String build(List<Object> key);
     }
 
     public static StateFactory opaque(String hosts) {
