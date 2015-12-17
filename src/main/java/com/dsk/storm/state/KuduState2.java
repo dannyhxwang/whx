@@ -39,7 +39,6 @@ public class KuduState2<T> implements IBackingMap<T> {
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
         if (keys.size() == 0) {
-            System.out.println("----------------keys.none");
             return Collections.emptyList();
         }
 
@@ -76,7 +75,7 @@ public class KuduState2<T> implements IBackingMap<T> {
                     while (results.hasNext()) {
                         RowResult result = results.next();
                         System.out.println(result.getString("value"));
-                        values.add(result.getString("value"));
+                        values.add(result.getString("value") == null ? null: result.getString("value"));
                     }
                 }
             }
