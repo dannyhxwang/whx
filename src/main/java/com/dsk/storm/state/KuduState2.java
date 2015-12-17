@@ -89,14 +89,19 @@ public class KuduState2<T> implements IBackingMap<T> {
     private List<String> getAllKeys(List<List<Object>> keys) {
         List<String> values = new ArrayList<String>(keys.size());
         for (List<Object> key : keys) {
-            if (key.size() != 1)
+            if (key.size() != 1){
                 throw new RuntimeException("Default KeyFactory does not support compound keys");
+            }
+            System.out.println("------------all keys start"+key.get(0));
             values.add((String) key.get(0));
+            System.out.println("------------all keys end"+key.get(0));
         }
         return values;
     }
 
+
     private List<T> deserializeValues(List<List<Object>> keys, List<String> values) {
+        System.out.println("------------deserialize value start ");
         List<T> result = new ArrayList<T>(keys.size());
         for (String value : values) {
             if (value != null) {
@@ -105,6 +110,7 @@ public class KuduState2<T> implements IBackingMap<T> {
                 result.add(null);
             }
         }
+        System.out.println("------------deserialize value end ");
         return result;
     }
 
