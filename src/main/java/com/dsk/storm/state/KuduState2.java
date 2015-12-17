@@ -10,7 +10,10 @@ import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: yanbit
@@ -81,14 +84,13 @@ public class KuduState2<T> implements IBackingMap<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.printf("=====================end all value "+ values.toString());
         return values;
     }
 
     private List<String> getAllKeys(List<List<Object>> keys) {
         List<String> values = new ArrayList<String>(keys.size());
         for (List<Object> key : keys) {
-            if (key.size() != 1){
+            if (key.size() != 1) {
                 throw new RuntimeException("Default KeyFactory does not support compound keys");
             }
             values.add((String) key.get(0));
@@ -101,33 +103,58 @@ public class KuduState2<T> implements IBackingMap<T> {
         System.out.println("------------deserialize value start ");
         List<T> result = new ArrayList<T>(keys.size());
         for (String value : values) {
-            System.out.println("========================value=========="+value);
             if (value != null) {
                 result.add((T) serializer.deserialize(value.getBytes()));
             } else {
                 result.add(null);
             }
         }
-        System.out.println("------------deserialize value end ");
-        System.out.println("------------deserialize value values "+result.toString());
         return result;
     }
 
     @Override
     public void multiPut(List<List<Object>> keys, List<T> vals) {
-        KuduSession session = kuduClient.newSession();
-        KuduTable table;
+        if (keys.size() == 0) {
+            return;
+        }
+        KuduTable table = null;
         try {
             table = kuduClient.openTable(options.tablename);
-            Insert insert = table.newInsert();
-            for (int i = 0; i < keys.size(); i++) {
-                List<Object> list = keys.get(i);
-                for (Object obj : list) {
-                    System.out.println("------------------------put keys" + obj);
-                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        for (int i = 0; i < keys.size(); i++) {
+            String key = (String) keys.get(i).get(0);
+            String val = new String(serializer.serialize(vals.get(i)));
+            System.out.println("=================key =============== value " + key + ":" + val);
+            try {
+                Insert insert = table.newInsert();
+                PartialRow row = insert.getRow();
+                row.addString(0, key);
+                row.addString(1, val);
+                OperationResponse rsInsert = session.apply(insert);
+                if (rsInsert.hasRowError()) {
+                    if ("key already present".equals(rsInsert.getRowError().getMessage())) {
+                        Update update = table.newUpdate();
+                        PartialRow urow = update.getRow();
+                        urow.addString(0, key);
+                        urow.addString(1, val);
+                        OperationResponse rsUpdate = session.apply(update);
+                        if (rsUpdate.hasRowError()) {
+                            System.out.println("=======================================ERROR UPDATE :" + rsUpdate.getRowError());
+                        } else {
+                            System.out.println("=======================================UPDATE DATA:" + key + ":" + val);
+                        }
+                    } else {
+                        System.out.println("=======================================ERROR INSERT :" + rsInsert.getRowError());
+                    }
+                } else {
+                    System.out.println("=======================================INSERT DATA:" + key + ":" + val);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -135,6 +162,7 @@ public class KuduState2<T> implements IBackingMap<T> {
     private KuduClient kuduClient;
     private Options<T> options;
     private Serializer<T> serializer;
+    private KuduSession session = kuduClient.newSession();
 
     public KuduState2(String hosts, Options<T> options, Serializer<T> serializer) {
         kuduClient = new KuduClient.KuduClientBuilder(hosts).build();

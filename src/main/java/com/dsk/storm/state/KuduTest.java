@@ -14,6 +14,19 @@ import java.util.List;
 public class KuduTest {
     public static void main(String[] args) throws Exception {
         String table = "my_first_table";
+        KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
+        KuduTable t = client.openTable(table);
+        Update update = t.newUpdate();
+        PartialRow row = update.getRow();
+        row.addLong(0,10);
+        row.addString(1,"11111111111111111");
+        KuduSession session=client.newSession();
+        session.apply(update);
+        client.shutdown();
+    }
+
+    public void  test() throws Exception {
+        String table = "my_first_table";
         List<String> cols = new ArrayList<String>();
         cols.add("name");
         KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
