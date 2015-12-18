@@ -132,7 +132,6 @@ public class KuduState2<T> implements IBackingMap<T> {
         for (int i = 0; i < keys.size(); i++) {
             String key = (String) keys.get(i).get(0);
             String val = new String(serializer.serialize(vals.get(i)));
-            System.out.println("=================key =============== value " + key + ":" + val);
             try {
                 Insert insert = table.newInsert();
                 PartialRow row = insert.getRow();
@@ -147,11 +146,12 @@ public class KuduState2<T> implements IBackingMap<T> {
         try {
             // insert flush
             List<OperationResponse> orlist = session.flush();
+            System.out.println("==========================="+orlist);
             for (OperationResponse or: orlist){
                 if (or.hasRowError()){
-                    System.out.println(""+or.getRowError());
                     Map<String,String> map = aTable.row(Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
                     for (Map.Entry<String, String> entry : map.entrySet()) {
+                        System.out.println("key :"+entry.getKey()+" value :"+entry.getValue());
                         Update update =table.newUpdate();
                         PartialRow urow = update.getRow();
                         urow.addString(0,entry.getKey());
