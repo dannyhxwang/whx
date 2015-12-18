@@ -30,7 +30,7 @@ public class KuduState2<T> implements IBackingMap<T> {
     }
 
     public static class Options<T> implements Serializable {
-        public int localCacheSize = 1000;
+        public int localCacheSize = 5000;
         public String globalKey = "$KUDU__GLOBAL_KEY__$";
         public Serializer<T> serializer = null;
         public String tablename = "test_request_count";
@@ -149,12 +149,14 @@ public class KuduState2<T> implements IBackingMap<T> {
             List<OperationResponse> orlist = session.flush();
             for (OperationResponse or: orlist){
                 if (or.hasRowError()){
+                    System.out.println(""+or.getRowError());
                     Map<String,String> map = aTable.row(Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
                     for (Map.Entry<String, String> entry : map.entrySet()) {
                         Update update =table.newUpdate();
                         PartialRow urow = update.getRow();
                         urow.addString(0,entry.getKey());
                         urow.addString(1,entry.getValue());
+                        session.apply(update);
                     }
                 }
             }
