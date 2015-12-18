@@ -30,4 +30,9 @@ public class Constants {
     // state
     public static final int DEFAULT_CACHE_SIZE = 10000;
     public static final int DEFAULT_BATCH_SIZE = 10000;
+
+    //hbase
+    public static final int HBASE_BATCH_SIZE = 20000;
+    public static final String UPMATCH_TABLE = "upmatch";
+    public static final String FAMILY_NAME = "info";
 }
