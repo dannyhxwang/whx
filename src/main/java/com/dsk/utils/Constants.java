@@ -19,6 +19,7 @@ public class Constants {
     //storm
     public static final String TOPIC = "test_upusers";
     public static final String TOPIC_REQUEST_COUNT = "test_request_count";
+    public static final String TOPIC_UPMATCH = "test_upmatch";
 //    public static final String TOPIC = "test";
     public static final String GROUP_ID = "TEST";
 
@@ -30,4 +31,9 @@ public class Constants {
     // state
     public static final int DEFAULT_CACHE_SIZE = 10000;
     public static final int DEFAULT_BATCH_SIZE = 10000;
+
+    //hbase
+    public static final int HBASE_BATCH_SIZE = 5000;
+    public static final String UPMATCH_TABLE = "upmatch";
+    public static final String FAMILY_NAME = "info";
 }

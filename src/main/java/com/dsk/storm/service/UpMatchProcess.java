@@ -16,21 +16,22 @@ import java.util.Properties;
 import java.util.UUID;
 
 /**
- * Created by wanghaixing on 2015/11/12.
+ * Created by wanghaixing
+ * on 2015/12/18 15:25.
  */
-public class LogProcess {
+public class UpMatchProcess {
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         TopologyBuilder builder = new TopologyBuilder();
         BrokerHosts hosts = new ZkHosts(Constants.ZOOKEEPER_LIST);
-        String zkRoot = "/" + Constants.TOPIC;
+        String zkRoot = "/" + Constants.TOPIC_UPMATCH;
         String id = UUID.randomUUID().toString();
-        SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC, zkRoot, id);
+        SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC_UPMATCH, zkRoot, id);
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
-        builder.setSpout("spout1", new KafkaSpout(spoutConfig));
-        builder.setBolt("bolt1", new LogFilterBolt(), 10).shuffleGrouping("spout1");
+        builder.setSpout("upmatch_spout", new KafkaSpout(spoutConfig));
+        builder.setBolt("upmatch_bolt", new LogFilterBolt(), 3).shuffleGrouping("upmatch_spout");
 
         Config config = new Config();
         Properties props = new Properties();
@@ -41,7 +42,7 @@ public class LogProcess {
 //        config.setNumWorkers(2);
         config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
-        config.setNumAckers(3);
-        StormSubmitter.submitTopology("testwhx", config, builder.createTopology());
+//        config.setNumAckers(3);
+        StormSubmitter.submitTopology("testupmatch", config, builder.createTopology());
     }
 }
