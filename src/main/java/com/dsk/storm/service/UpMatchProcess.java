@@ -8,6 +8,7 @@ import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
 import com.dsk.storm.bolts.LogFilterBolt;
+import com.dsk.storm.bolts.UpMatchBolt;
 import com.dsk.utils.Constants;
 import storm.kafka.*;
 import storm.kafka.bolt.KafkaBolt;
@@ -31,7 +32,7 @@ public class UpMatchProcess {
         spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("upmatch_spout", new KafkaSpout(spoutConfig));
-        builder.setBolt("upmatch_bolt", new LogFilterBolt(), 3).shuffleGrouping("upmatch_spout");
+        builder.setBolt("upmatch_bolt", new UpMatchBolt(), 3).shuffleGrouping("upmatch_spout");
 
         Config config = new Config();
         Properties props = new Properties();
