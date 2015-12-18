@@ -127,8 +127,6 @@ public class KuduState2<T> implements IBackingMap<T> {
 
         Table<String, String, String> aTable = HashBasedTable.create();
 
-        //set flush size
-        session.setMutationBufferSpace(keys.size());
         for (int i = 0; i < keys.size(); i++) {
             String key = (String) keys.get(i).get(0);
             String val = new String(serializer.serialize(vals.get(i)));
@@ -184,8 +182,9 @@ public class KuduState2<T> implements IBackingMap<T> {
         this.options = options;
         this.serializer = serializer;
         this.session = kuduClient.newSession();
+        session.setMutationBufferSpace(32*1024*1024);
         this.session.setTimeoutMillis(60 * 1000);
-        this.session.setFlushMode(KuduSession.FlushMode.MANUAL_FLUSH);
+        this.session.setFlushMode(KuduSession.FlushMode.AUTO_FLUSH_BACKGROUND);
         try {
             table = kuduClient.openTable(options.tablename);
         } catch (Exception e) {
