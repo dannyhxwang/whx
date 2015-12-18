@@ -1,11 +1,13 @@
 package com.dsk.storm.state;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.kududb.Schema;
 import org.kududb.client.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,27 +26,36 @@ public class KuduTest {
         session = client.newSession();
         //session.setMutationBufferSpace(32 * 1024 * 1024);
         session.setTimeoutMillis(60 * 1000);
-        session.setFlushMode(KuduSession.FlushMode.AUTO_FLUSH_SYNC);
+        session.setFlushMode(KuduSession.FlushMode.MANUAL_FLUSH);
     }
 
     public static void main(String[] args) throws Exception {
+        Table<String, String, String> aTable = HashBasedTable.create();
         String table = "my_first_table";
         KuduTable t = client.openTable(table);
-        List<OperationResponse> oper = Lists.newArrayList();
 
         Insert insert = t.newInsert();
         PartialRow row = insert.getRow();
-        row.addLong(0, 10);
+        row.addLong(0, 1000000);
         row.addString(1, "11111111111111111");
         OperationResponse response = session.apply(insert);
-        System.out.println(response);
-        oper.add(response);
+        List<OperationResponse> orlist = session.flush();
 
+        aTable.put(Arrays.toString(row.encodePrimaryKey()),"100000000","111111111111");
+        System.out.println(aTable);
+        //Row error for primary key=[-128, 0, 0, 0, 0, 15, 66, 64],
+        System.out.println("orlist"+orlist);
+        OperationResponse or = orlist.get(0);
+        System.out.println(Arrays.toString(row.encodePrimaryKey()));
+
+
+        System.out.println("!!!"+Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
+        Update update = t.newUpdate();
+        PartialRow urow = update.getRow();
+        urow.addLong(0, 100000);
+        urow.addString(1, "22222222222222222");
+        session.apply(update);
         session.flush();
-//        List<RowError> relist = OperationResponse.collectErrors(oper);
-//        System.out.println(relist);
-
-        System.out.println("---response---" + response);
         client.shutdown();
         System.out.println(new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
     }

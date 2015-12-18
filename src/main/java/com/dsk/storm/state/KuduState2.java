@@ -2,8 +2,10 @@ package com.dsk.storm.state;
 
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 import org.kududb.Schema;
 import org.kududb.client.*;
 import storm.trident.state.*;
@@ -122,38 +124,46 @@ public class KuduState2<T> implements IBackingMap<T> {
         if (keys.size() == 0) {
             return;
         }
+
+        Table<String, String, String> aTable = HashBasedTable.create();
+
+        //set flush size
+        session.setMutationBufferSpace(keys.size());
         for (int i = 0; i < keys.size(); i++) {
             String key = (String) keys.get(i).get(0);
             String val = new String(serializer.serialize(vals.get(i)));
             System.out.println("=================key =============== value " + key + ":" + val);
+
             try {
                 Insert insert = table.newInsert();
                 PartialRow row = insert.getRow();
                 row.addString(0, key);
                 row.addString(1, val);
+                aTable.put(Arrays.toString(row.encodePrimaryKey()),key,val);
                 OperationResponse rsInsert = session.apply(insert);
-//                if (rsInsert.hasRowError()) {
-//                    if ("key already present".equals(rsInsert.getRowError().getMessage())) {
-                        Update update = table.newUpdate();
-                        PartialRow urow = update.getRow();
-                        urow.addString(0, key);
-                        urow.addString(1, val);
-                        OperationResponse rsUpdate = session.apply(update);
-                        if (rsUpdate.hasRowError()) {
-                            System.out.println("=======================================ERROR UPDATE :" + rsUpdate.getRowError());
-                        } else {
-                            System.out.println("=======================================UPDATE DATA:" + key + ":" + val);
-                        }
-//                    } else {
-//                        System.out.println("=======================================ERROR INSERT :" + rsInsert.getRowError());
-//                    }
-//                } else {
-//                    System.out.println("=======================================INSERT DATA:" + key + ":" + val);
-//                }
             } catch (Exception e) {
-
                 e.printStackTrace();
             }
+        }
+        try {
+            // insert flush
+            List<OperationResponse> orlist = session.flush();
+            for (OperationResponse or: orlist){
+                if (or.hasRowError()){
+                    Map<String,String> map = aTable.row(Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        Update update =table.newUpdate();
+                        PartialRow urow = update.getRow();
+                        urow.addString(0,entry.getKey());
+                        urow.addString(1,entry.getValue());
+                    }
+                }
+            }
+            // update flush
+            session.flush();
+            aTable.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         System.out.println("---------------multiPut end--------------" +
                 new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
