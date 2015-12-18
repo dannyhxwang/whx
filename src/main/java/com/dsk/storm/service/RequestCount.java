@@ -8,7 +8,7 @@ import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.tuple.Fields;
 import com.dsk.storm.function.RequestCountETL;
-import com.dsk.storm.state.RedisState;
+import com.dsk.storm.state.KuduState2;
 import com.dsk.utils.Constants;
 import storm.kafka.BrokerHosts;
 import storm.kafka.StringScheme;
@@ -20,7 +20,6 @@ import storm.trident.TridentTopology;
 import storm.trident.operation.builtin.Count;
 import storm.trident.state.StateFactory;
 
-import java.net.InetSocketAddress;
 import java.util.UUID;
 
 /**
