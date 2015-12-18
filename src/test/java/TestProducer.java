@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * Created by user on 8/4/14.
  */
 public class TestProducer {
-    final static String TOPIC = "test_upusers_2";
+    final static String TOPIC = "topic1";
 
     public static void main(String[] argv) {
         while (true) {
