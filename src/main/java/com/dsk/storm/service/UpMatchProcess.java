@@ -29,7 +29,7 @@ public class UpMatchProcess {
         String id = UUID.randomUUID().toString();
         SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC_UPMATCH, zkRoot, id);
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-        spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+//        spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("upmatch_spout", new KafkaSpout(spoutConfig));
         builder.setBolt("upmatch_bolt", new UpMatchBolt(), 3).shuffleGrouping("upmatch_spout");

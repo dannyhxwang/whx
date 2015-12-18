@@ -21,6 +21,7 @@ public class UpMatchBolt extends BaseRichBolt {
     private OutputCollector collector;
     private Map<String, UpMatcher> dataMap;
     private String preDate;
+    private int num = 0;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
@@ -35,12 +36,15 @@ public class UpMatchBolt extends BaseRichBolt {
         String line = tuple.getString(0);
         String items[] = line.split(",");
         if(items.length == 10) {
+            System.out.println(line);
             String currentDate = items[9].trim();
 
             //如果当前数据日期与上一条数据日期不同，则认为前一天的数据发送完毕
-            if (!currentDate.equals(preDate)) {
+//            if (!currentDate.equals(preDate)) {
+            if (num > 20000) {
                 //store to hbase
-                new HbaseTask(dataMap).dowork();
+                    new HbaseTask(dataMap).dowork();
+                num = 0;
             } else {
                 String rowkey = StringOperator.encryptByMd5(items[0] + items[1] + items[2] + items[3] + items[4]);
                 UpMatcher upMatcher = dataMap.get(rowkey);
@@ -58,6 +62,7 @@ public class UpMatchBolt extends BaseRichBolt {
                 dataMap.put(rowkey, upMatcher);
             }
             preDate = currentDate;
+            num++;
 
         }
         this.collector.ack(tuple);
