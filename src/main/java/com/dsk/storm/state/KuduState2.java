@@ -30,7 +30,7 @@ public class KuduState2<T> implements IBackingMap<T> {
     }
 
     public static class Options<T> implements Serializable {
-        public int localCacheSize = 1000;
+        public int localCacheSize = 2000;
         public String globalKey = "$KUDU__GLOBAL_KEY__$";
         public Serializer<T> serializer = null;
         public String tablename = "test_request_count";
@@ -132,7 +132,6 @@ public class KuduState2<T> implements IBackingMap<T> {
         for (int i = 0; i < keys.size(); i++) {
             String key = (String) keys.get(i).get(0);
             String val = new String(serializer.serialize(vals.get(i)));
-            System.out.println("=================key =============== value " + key + ":" + val);
             try {
                 Insert insert = table.newInsert();
                 PartialRow row = insert.getRow();
@@ -147,14 +146,17 @@ public class KuduState2<T> implements IBackingMap<T> {
         try {
             // insert flush
             List<OperationResponse> orlist = session.flush();
+            System.out.println("==========================="+orlist);
             for (OperationResponse or: orlist){
                 if (or.hasRowError()){
                     Map<String,String> map = aTable.row(Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
                     for (Map.Entry<String, String> entry : map.entrySet()) {
+                        System.out.println("key :"+entry.getKey()+" value :"+entry.getValue());
                         Update update =table.newUpdate();
                         PartialRow urow = update.getRow();
                         urow.addString(0,entry.getKey());
                         urow.addString(1,entry.getValue());
+                        session.apply(update);
                     }
                 }
             }
