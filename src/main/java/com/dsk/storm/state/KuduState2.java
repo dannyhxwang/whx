@@ -132,6 +132,7 @@ public class KuduState2<T> implements IBackingMap<T> {
                 row.addString(0, key);
                 row.addString(1, val);
                 OperationResponse rsInsert = session.apply(insert);
+                System.out.println("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"+rsInsert);
                 if (rsInsert.hasRowError()) {
                     if ("key already present".equals(rsInsert.getRowError().getMessage())) {
                         Update update = table.newUpdate();
