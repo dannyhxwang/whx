@@ -24,14 +24,14 @@ public class UpMatchProcess {
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         TopologyBuilder builder = new TopologyBuilder();
         BrokerHosts hosts = new ZkHosts(Constants.ZOOKEEPER_LIST);
-        String zkRoot = "/" + Constants.TOPIC;
+        String zkRoot = "/" + Constants.TOPIC_UPMATCH;
         String id = UUID.randomUUID().toString();
-        SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC, zkRoot, id);
+        SpoutConfig spoutConfig = new SpoutConfig(hosts, Constants.TOPIC_UPMATCH, zkRoot, id);
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 //        spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("upmatch_spout", new KafkaSpout(spoutConfig));
-        builder.setBolt("upmatch_bolt", new LogFilterBolt(), 10).shuffleGrouping("upmatch_spout");
+        builder.setBolt("upmatch_bolt", new LogFilterBolt(), 3).shuffleGrouping("upmatch_spout");
 
         Config config = new Config();
         Properties props = new Properties();
@@ -42,7 +42,7 @@ public class UpMatchProcess {
 //        config.setNumWorkers(2);
         config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
-        config.setNumAckers(3);
+//        config.setNumAckers(3);
         StormSubmitter.submitTopology("testupmatch", config, builder.createTopology());
     }
 }
