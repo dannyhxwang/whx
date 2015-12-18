@@ -7,7 +7,6 @@ import org.kududb.client.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class KuduTest {
         client = new KuduClient.KuduClientBuilder("namenode").build();
 
         session = client.newSession();
-        //session.setMutationBufferSpace(32 * 1024 * 1024);
+        session.setMutationBufferSpace(32 * 1024 * 1024);
         session.setTimeoutMillis(60 * 1000);
         session.setFlushMode(KuduSession.FlushMode.MANUAL_FLUSH);
     }
@@ -34,30 +33,35 @@ public class KuduTest {
         String table = "my_first_table";
         KuduTable t = client.openTable(table);
 
-        Insert insert = t.newInsert();
-        PartialRow row = insert.getRow();
-        row.addLong(0, 1000000);
-        row.addString(1, "11111111111111111");
-        OperationResponse response = session.apply(insert);
-        List<OperationResponse> orlist = session.flush();
+//        Insert insert = t.newInsert();
+//        PartialRow row = insert.getRow();
+//        row.addLong(0, 1000000);
+//        row.addString(1, "11111111111111111");
+//        OperationResponse response = session.apply(insert);
+//        List<OperationResponse> orlist = session.flush();
 
-        aTable.put(Arrays.toString(row.encodePrimaryKey()),"100000000","111111111111");
-        System.out.println(aTable);
-        //Row error for primary key=[-128, 0, 0, 0, 0, 15, 66, 64],
-        System.out.println("orlist"+orlist);
-        OperationResponse or = orlist.get(0);
-        System.out.println(Arrays.toString(row.encodePrimaryKey()));
-
-
-        System.out.println("!!!"+Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
-        Update update = t.newUpdate();
-        PartialRow urow = update.getRow();
-        urow.addLong(0, 100000);
-        urow.addString(1, "22222222222222222");
-        session.apply(update);
+        Delete delete = t.newDelete();
+        PartialRow drow = delete.getRow();
+        drow.addLong(0, 100000);
+        session.apply(delete);
         session.flush();
+//        aTable.put(Arrays.toString(row.encodePrimaryKey()),"100000000","111111111111");
+//        System.out.println(aTable);
+//        //Row error for primary key=[-128, 0, 0, 0, 0, 15, 66, 64],
+//        System.out.println("orlist"+orlist);
+//        OperationResponse or = orlist.get(0);
+//        System.out.println(Arrays.toString(row.encodePrimaryKey()));
+
+
+//        System.out.println("!!!"+Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
+//        Update update = t.newUpdate();
+//        PartialRow urow = update.getRow();
+//        urow.addLong(0, 100000);
+//        urow.addString(1, "22222222222222222");
+//        session.apply(update);
+//        session.flush();
         client.shutdown();
-        System.out.println(new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+//        System.out.println(new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
     }
 
 

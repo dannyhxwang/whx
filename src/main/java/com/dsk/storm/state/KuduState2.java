@@ -133,7 +133,6 @@ public class KuduState2<T> implements IBackingMap<T> {
             String key = (String) keys.get(i).get(0);
             String val = new String(serializer.serialize(vals.get(i)));
             System.out.println("=================key =============== value " + key + ":" + val);
-
             try {
                 Insert insert = table.newInsert();
                 PartialRow row = insert.getRow();
