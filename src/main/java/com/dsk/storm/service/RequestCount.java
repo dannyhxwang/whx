@@ -39,8 +39,8 @@ public class RequestCount {
         TransactionalTridentKafkaSpout tridentKafkaSpout = new TransactionalTridentKafkaSpout(tridentKafkaConfig);
 
         // Redis state
-        StateFactory state = RedisState.transactional(new InetSocketAddress("namenode", 6379), Constants.TOPIC_REQUEST_COUNT);
-//        StateFactory state = KuduState2.transactional("namenode");
+//        StateFactory state = RedisState.transactional(new InetSocketAddress("namenode", 6379), Constants.TOPIC_REQUEST_COUNT);
+        StateFactory state = KuduState2.transactional("namenode");
         // count request
         TridentTopology topology = new TridentTopology();
         TridentState test = topology.newStream(Constants.TOPIC_REQUEST_COUNT, tridentKafkaSpout)
