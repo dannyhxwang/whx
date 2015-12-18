@@ -2,19 +2,18 @@ package com.dsk.storm.state;
 
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.kududb.client.Insert;
-import org.kududb.client.KuduClient;
-import org.kududb.client.KuduSession;
-import org.kududb.client.KuduTable;
+import com.google.common.collect.Table;
+import org.kududb.Schema;
+import org.kududb.client.*;
 import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * User: yanbit
@@ -34,74 +33,164 @@ public class KuduState2<T> implements IBackingMap<T> {
         public int localCacheSize = 1000;
         public String globalKey = "$KUDU__GLOBAL_KEY__$";
         public Serializer<T> serializer = null;
-        public String tablename = "test_wordcount";
+        public String tablename = "test_request_count";
     }
 
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
-        if (keys.size()==0){
+
+        System.out.println("---------------multiGet start--------------" +
+                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        if (keys.size() == 0) {
             return Collections.emptyList();
         }
 
-//        Map<byte[], byte[]> keyValue = hgetAll(this.options.hkey.getBytes()); get all keys
-//        List<String> values = buildValuesFromMap(keys, keyValue); get values by keys
-//        private List<String> buildValuesFromMap(List<List<Object>> keys, Map<byte[], byte[]> keyValue) {
-//            List<String> values = new ArrayList<String>(keys.size());
-//            for (List<Object> key : keys) {
-//                String strKey = keyFactory.build(key);
-//                byte[] bytes = keyValue.get(strKey.getBytes());
-//                values.add(bytes == null ? null : new String(bytes));
-//            }
-//            return values;
-//        }
-//        return deserializeValues(keys, values);
+        List<String> allkeys = getAllKeys(keys);
+        List<String> values = getAllValues(allkeys);
 
-        ///////////////////////////////
-        System.out.println("-----------keys.size()" + keys.size());
-        List<T> slist = Lists.newArrayList();
-        for (List<Object> lobj : keys){
-            System.out.println("-----------lobj---------keys.size()"+lobj.size());
-            for (Object obj : lobj){
-                System.out.println("-------------all keys:"+obj);
-                slist.add((T)obj);
+        System.out.println("---------------multiGet end--------------" +
+                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        return deserializeValues(keys, values);
+    }
+
+    private List<String> getAllValues(List<String> keys) {
+        System.out.println("---------------get all value start--------------" +
+                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        ArrayList<String> values = Lists.newArrayList();
+        try {
+            List<String> cols = new ArrayList<String>();
+            cols.add("value");
+            KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
+            Schema schema = table.getSchema();
+
+            for (String key : keys) {
+                PartialRow start = schema.newPartialRow();
+                start.addString("key", key);
+                PartialRow end = schema.newPartialRow();
+                end.addString("key", key + "1");
+                KuduScanner scanner = client.newScannerBuilder(table)
+                        .lowerBound(start)
+                        .exclusiveUpperBound(end)
+                        .setProjectedColumnNames(cols)
+                        .build();
+                String value = null;
+                while (scanner.hasMoreRows()) {
+                    RowResultIterator results = scanner.nextRows();
+                    while (results.hasNext()) {
+                        RowResult result = results.next();
+                        value = result.getString("value");
+                    }
+                }
+                values.add(value);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("---------------get all value end--------------" +
+                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        return values;
+    }
+
+    private List<String> getAllKeys(List<List<Object>> keys) {
+        List<String> values = new ArrayList<String>(keys.size());
+        for (List<Object> key : keys) {
+            if (key.size() != 1) {
+                throw new RuntimeException("Default KeyFactory does not support compound keys");
+            }
+            values.add((String) key.get(0));
+        }
+        return values;
+    }
+
+
+    private List<T> deserializeValues(List<List<Object>> keys, List<String> values) {
+        System.out.println("------------deserialize value start ");
+        List<T> result = new ArrayList<T>(keys.size());
+        for (String value : values) {
+            if (value != null) {
+                result.add((T) serializer.deserialize(value.getBytes()));
+            } else {
+                result.add(null);
             }
         }
-
-        return slist;
+        return result;
     }
 
     @Override
     public void multiPut(List<List<Object>> keys, List<T> vals) {
-        KuduSession session = kuduClient.newSession();
-        KuduTable table;
-        try {
-            table = kuduClient.openTable(options.tablename);
-            Insert insert = table.newInsert();
-            for (int i = 0; i < keys.size(); i++) {
-                List<Object> list = keys.get(i);
-                for (Object  obj : list){
-                    System.out.println("------------------------put keys"+obj);
-                }
-//                Composite columnName = toColumnName(keys.get(i));
-//                byte[] bytes = serializer.serialize(values.get(i));
-//                HColumn<Composite, byte[]> column = HFactory.createColumn(columnName, bytes);
-//                mutator.insert(options.rowKey, options.columnFamily, column);
+        System.out.println("---------------multiPut start--------------" +
+                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        if (keys.size() == 0) {
+            return;
+        }
+
+        Table<String, String, String> aTable = HashBasedTable.create();
+
+        //set flush size
+        session.setMutationBufferSpace(keys.size());
+        for (int i = 0; i < keys.size(); i++) {
+            String key = (String) keys.get(i).get(0);
+            String val = new String(serializer.serialize(vals.get(i)));
+            System.out.println("=================key =============== value " + key + ":" + val);
+
+            try {
+                Insert insert = table.newInsert();
+                PartialRow row = insert.getRow();
+                row.addString(0, key);
+                row.addString(1, val);
+                aTable.put(Arrays.toString(row.encodePrimaryKey()),key,val);
+                OperationResponse rsInsert = session.apply(insert);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        }
+        try {
+            // insert flush
+            List<OperationResponse> orlist = session.flush();
+            for (OperationResponse or: orlist){
+                if (or.hasRowError()){
+                    Map<String,String> map = aTable.row(Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        Update update =table.newUpdate();
+                        PartialRow urow = update.getRow();
+                        urow.addString(0,entry.getKey());
+                        urow.addString(1,entry.getValue());
+                    }
+                }
+            }
+            // update flush
+            session.flush();
+            aTable.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("---------------multiPut end--------------" +
+                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
     }
 
     //
     private KuduClient kuduClient;
     private Options<T> options;
     private Serializer<T> serializer;
+    private KuduSession session;
+    private KuduTable table;
 
     public KuduState2(String hosts, Options<T> options, Serializer<T> serializer) {
         kuduClient = new KuduClient.KuduClientBuilder(hosts).build();
         this.options = options;
         this.serializer = serializer;
+        this.session = kuduClient.newSession();
+        this.session.setMutationBufferSpace(32*1024*1024);
+        this.session.setTimeoutMillis(60*1000);
+        this.session.setFlushMode(KuduSession.FlushMode.AUTO_FLUSH_BACKGROUND);
+        try {
+            table = kuduClient.openTable(options.tablename);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
     // factory
     protected static class Factory implements StateFactory {
         private StateType stateType;
@@ -144,6 +233,7 @@ public class KuduState2<T> implements IBackingMap<T> {
             return new SnapshottableMap(mapState, new Values(options.globalKey));
         }
     }
+
 
     public static StateFactory opaque(String hosts) {
         return opaque(hosts, new Options<OpaqueValue>());
