@@ -53,6 +53,9 @@ public class HbaseTask {
                 upList.add(put);
             }
         }
+        if (upList.size() > 0) {
+            service.submit(new LoadToHBase(upList));
+        }
         service.shutdown();
     }
 
