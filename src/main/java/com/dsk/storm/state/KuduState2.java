@@ -12,7 +12,6 @@ import storm.trident.state.*;
 import storm.trident.state.map.*;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -38,35 +37,31 @@ public class KuduState2<T> implements IBackingMap<T> {
 
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
-
-        System.out.println("---------------multiGet start--------------" +
-                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        long startTime = System.currentTimeMillis();
         if (keys.size() == 0) {
             return Collections.emptyList();
         }
 
         List<String> allkeys = getAllKeys(keys);
         List<String> values = getAllValues(allkeys);
-
-        System.out.println("---------------multiGet end--------------" +
-                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        long resultTime = System.currentTimeMillis() - startTime;
+        System.out.println("---------------multiGet count time-------------- " + resultTime);
         return deserializeValues(keys, values);
     }
 
     private List<String> getAllValues(List<String> keys) {
+        long startTime = System.currentTimeMillis();
         ArrayList<String> values = Lists.newArrayList();
         try {
             List<String> cols = new ArrayList<String>();
             cols.add("value");
-            KuduClient client = new KuduClient.KuduClientBuilder("namenode").build();
             Schema schema = table.getSchema();
-
             for (String key : keys) {
                 PartialRow start = schema.newPartialRow();
                 start.addString("key", key);
                 PartialRow end = schema.newPartialRow();
                 end.addString("key", key + "1");
-                KuduScanner scanner = client.newScannerBuilder(table)
+                KuduScanner scanner = kuduClient.newScannerBuilder(table)
                         .lowerBound(start)
                         .exclusiveUpperBound(end)
                         .setProjectedColumnNames(cols)
@@ -81,14 +76,16 @@ public class KuduState2<T> implements IBackingMap<T> {
                 }
                 values.add(value);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+        long countTime = System.currentTimeMillis() - startTime;
+        System.out.println("---------------Get all values count time-------------- " + countTime);
         return values;
     }
 
     private List<String> getAllKeys(List<List<Object>> keys) {
+        long startTime = System.currentTimeMillis();
         List<String> values = new ArrayList<String>(keys.size());
         for (List<Object> key : keys) {
             if (key.size() != 1) {
@@ -96,11 +93,15 @@ public class KuduState2<T> implements IBackingMap<T> {
             }
             values.add((String) key.get(0));
         }
+
+        long countTime = System.currentTimeMillis() - startTime;
+        System.out.println("---------------Get all keys count time-------------- " + countTime);
         return values;
     }
 
 
     private List<T> deserializeValues(List<List<Object>> keys, List<String> values) {
+        long startTime = System.currentTimeMillis();
         List<T> result = new ArrayList<T>(keys.size());
         for (String value : values) {
             if (value != null) {
@@ -109,13 +110,14 @@ public class KuduState2<T> implements IBackingMap<T> {
                 result.add(null);
             }
         }
+        long countTime = System.currentTimeMillis() - startTime;
+        System.out.println("---------------deserialize value count time-------------- " + countTime);
         return result;
     }
 
     @Override
     public void multiPut(List<List<Object>> keys, List<T> vals) {
-        System.out.println("---------------multiPut start--------------" +
-                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        long startTime = System.currentTimeMillis();
         if (keys.size() == 0) {
             return;
         }
@@ -160,8 +162,8 @@ public class KuduState2<T> implements IBackingMap<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("---------------multiPut end--------------" +
-                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
+        long countTime = System.currentTimeMillis() - startTime;
+        System.out.println("---------------mutil put count time-------------- " + countTime);
     }
 
     //
@@ -176,7 +178,7 @@ public class KuduState2<T> implements IBackingMap<T> {
         this.options = options;
         this.serializer = serializer;
         this.session = kuduClient.newSession();
-        session.setMutationBufferSpace(32*1024*1024);
+        session.setMutationBufferSpace(32 * 1024 * 1024);
         this.session.setTimeoutMillis(60 * 1000);
         this.session.setFlushMode(KuduSession.FlushMode.AUTO_FLUSH_BACKGROUND);
         try {
