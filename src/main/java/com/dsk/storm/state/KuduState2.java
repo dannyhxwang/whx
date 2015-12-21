@@ -127,8 +127,6 @@ public class KuduState2<T> implements IBackingMap<T> {
 
         Table<String, String, String> aTable = HashBasedTable.create();
 
-        //set flush size
-        session.setMutationBufferSpace(keys.size());
         for (int i = 0; i < keys.size(); i++) {
             String key = (String) keys.get(i).get(0);
             String val = new String(serializer.serialize(vals.get(i)));
@@ -137,7 +135,7 @@ public class KuduState2<T> implements IBackingMap<T> {
                 PartialRow row = insert.getRow();
                 row.addString(0, key);
                 row.addString(1, val);
-                aTable.put(Arrays.toString(row.encodePrimaryKey()),key,val);
+                aTable.put(Arrays.toString(row.encodePrimaryKey()), key, val);
                 OperationResponse rsInsert = session.apply(insert);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -146,22 +144,24 @@ public class KuduState2<T> implements IBackingMap<T> {
         try {
             // insert flush
             List<OperationResponse> orlist = session.flush();
-            System.out.println("==========================="+orlist);
-            for (OperationResponse or: orlist){
-                if (or.hasRowError()){
-                    Map<String,String> map = aTable.row(Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
-                    for (Map.Entry<String, String> entry : map.entrySet()) {
-                        System.out.println("key :"+entry.getKey()+" value :"+entry.getValue());
-                        Update update =table.newUpdate();
-                        PartialRow urow = update.getRow();
-                        urow.addString(0,entry.getKey());
-                        urow.addString(1,entry.getValue());
-                        session.apply(update);
+            if (orlist.size() != 0) {
+                System.out.println("===========================" + orlist.size());
+                for (OperationResponse or : orlist) {
+                    if (or.hasRowError()) {
+                        Map<String, String> map = aTable.row(Arrays.toString(or.getRowError().getOperation().getRow().encodePrimaryKey()));
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            System.out.println("key :" + entry.getKey() + " value :" + entry.getValue());
+                            Update update = table.newUpdate();
+                            PartialRow urow = update.getRow();
+                            urow.addString(0, entry.getKey());
+                            urow.addString(1, entry.getValue());
+                            session.apply(update);
+                        }
                     }
                 }
+                // update flush
+                session.flush();
             }
-            // update flush
-            session.flush();
             aTable.clear();
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,8 +182,8 @@ public class KuduState2<T> implements IBackingMap<T> {
         this.options = options;
         this.serializer = serializer;
         this.session = kuduClient.newSession();
-        this.session.setMutationBufferSpace(32*1024*1024);
-        this.session.setTimeoutMillis(60*1000);
+        session.setMutationBufferSpace(32*1024*1024);
+        this.session.setTimeoutMillis(60 * 1000);
         this.session.setFlushMode(KuduSession.FlushMode.AUTO_FLUSH_BACKGROUND);
         try {
             table = kuduClient.openTable(options.tablename);
