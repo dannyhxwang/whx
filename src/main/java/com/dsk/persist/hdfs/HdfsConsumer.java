@@ -41,7 +41,7 @@ public class HdfsConsumer {
         Properties originalProps = new Properties();
         originalProps.put("zookeeper.connect", Constants.ZOOKEEPER_LIST);
         originalProps.put("group.id", Constants.GROUP_ID);
-        originalProps.put("auto.offset.reset", "smallest");
+        originalProps.put("auto.offset.reset", "earliest");
         originalProps.put("serializer.class", Constants.ENCODER);
         consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(originalProps));
 
