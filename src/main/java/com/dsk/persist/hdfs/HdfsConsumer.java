@@ -45,7 +45,7 @@ public class HdfsConsumer {
         consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(originalProps));
 
         Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-        topicCountMap.put(Constants.TOPIC, 1);
+        topicCountMap.put(Constants.TOPIC_UPMATCH, 1);
         StringDecoder keyDecoder = new StringDecoder(new VerifiableProperties());
         StringDecoder valueDecoder = new StringDecoder(new VerifiableProperties());
         topicMessageStreams = consumer.createMessageStreams(topicCountMap , keyDecoder, valueDecoder);
