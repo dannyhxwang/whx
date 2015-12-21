@@ -54,8 +54,6 @@ public class KuduState2<T> implements IBackingMap<T> {
     }
 
     private List<String> getAllValues(List<String> keys) {
-        System.out.println("---------------get all value start--------------" +
-                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
         ArrayList<String> values = Lists.newArrayList();
         try {
             List<String> cols = new ArrayList<String>();
@@ -87,8 +85,6 @@ public class KuduState2<T> implements IBackingMap<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("---------------get all value end--------------" +
-                new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS").format(new Date()));
         return values;
     }
 
@@ -105,7 +101,6 @@ public class KuduState2<T> implements IBackingMap<T> {
 
 
     private List<T> deserializeValues(List<List<Object>> keys, List<String> values) {
-        System.out.println("------------deserialize value start ");
         List<T> result = new ArrayList<T>(keys.size());
         for (String value : values) {
             if (value != null) {
@@ -114,7 +109,6 @@ public class KuduState2<T> implements IBackingMap<T> {
                 result.add(null);
             }
         }
-        System.out.println("------------deserialize value end ");
         return result;
     }
 
