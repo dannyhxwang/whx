@@ -43,13 +43,13 @@ public class UpMatchBolt extends BaseRichBolt {
 
             //如果当前数据日期与上一条数据日期不同，则认为前一天的数据发送完毕
 //            if (!currentDate.equals(preDate)) {
-//            String sourceComponent = tuple.getSourceComponent();
-//            if(sourceComponent.equals(backtype.storm.Constants.SYSTEM_COMPONENT_ID)) {
-            if (num > 20000) {
+            String sourceComponent = tuple.getSourceComponent();
+            if(sourceComponent.equals(backtype.storm.Constants.SYSTEM_COMPONENT_ID)) {
+//            if (num > 20000) {
                 //store to hbase
                 if (dataMap.size() > 0) {
                     new HbaseTask(dataMap).dowork();
-                    num = 0;
+//                    num = 0;
                 }
             } else {
                 String rowkey = StringOperator.encryptByMd5(items[0] + items[1] + items[2] + items[3] + items[4]);
@@ -66,7 +66,7 @@ public class UpMatchBolt extends BaseRichBolt {
                             items[6], items[7], count);
                 }
                 dataMap.put(rowkey, upMatcher);
-                num++;
+//                num++;
             }
 //            preDate = currentDate;
 
