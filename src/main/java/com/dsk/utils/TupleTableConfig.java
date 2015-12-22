@@ -1,6 +1,7 @@
 package com.dsk.utils;
 
 import backtype.storm.tuple.Tuple;
+import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -152,7 +153,7 @@ public class TupleTableConfig implements Serializable {
     public static void addIncrement(Increment inc, final byte[] family, final byte[] qualifier,
                                     final Long amount) {
 
-        NavigableMap<byte[], Long> set = inc.getFamilyMap().get(family);
+        NavigableMap<byte[], Long> set = (NavigableMap<byte[], Long>) inc.getFamilyMap().get(family);
         if (set == null) {
             set = new TreeMap<byte[], Long>(Bytes.BYTES_COMPARATOR);
         }
@@ -164,7 +165,7 @@ public class TupleTableConfig implements Serializable {
         }
         set.put(qualifier, amount + counter);
 
-        inc.getFamilyMap().put(family, set);
+        inc.getFamilyMap().put(family, (List<KeyValue>) set);
     }
 
     /**
