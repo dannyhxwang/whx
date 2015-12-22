@@ -56,7 +56,7 @@ public class HBaseCount {
         TridentTopology topology = new TridentTopology();
         topology
                 .newStream("spout", tridentKafkaSpout)
-                .groupBy(new Fields("key"))
+                .groupBy(new Fields("str"))
                 .persistentAggregate(state, new Count(), new Fields("count"));
 
         Config conf = new Config();
