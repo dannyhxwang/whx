@@ -33,8 +33,8 @@ public class UpMatchBolt extends BaseRichBolt {
     //XXXXX,stu_t,TAB_STARTUP_APP,aWRtYW4kaWRtYW4uZXhl,RGlzYWJsZQ==,6.7.69,us,isafe,1,20151216
     @Override
     public void execute(Tuple tuple) {
-        byte[] byteField = tuple.getBinary(0);
-        String line = new String(byteField);
+        Object obj = tuple.getValue(0);
+        String line = obj.toString();
 //        String line = tuple.getString(0);
         String items[] = line.split(",");
         if(items.length == 10) {
