@@ -74,6 +74,7 @@ public class KuduState2<T> implements IBackingMap<T> {
                         value = result.getString("value");
                     }
                 }
+                scanner.close();
                 values.add(value);
             }
         } catch (Exception e) {
