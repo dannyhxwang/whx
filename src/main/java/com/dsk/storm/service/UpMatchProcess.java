@@ -7,7 +7,6 @@ import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
-import com.dsk.storm.bolts.LogFilterBolt;
 import com.dsk.storm.bolts.UpMatchBolt;
 import com.dsk.utils.Constants;
 import storm.kafka.*;
@@ -44,6 +43,7 @@ public class UpMatchProcess {
         config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
 //        config.setNumAckers(3);
+        config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 30);
         StormSubmitter.submitTopology("testupmatch", config, builder.createTopology());
     }
 }
