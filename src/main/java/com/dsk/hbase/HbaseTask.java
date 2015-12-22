@@ -35,6 +35,7 @@ public class HbaseTask {
 
         for(Map.Entry<String, UpMatcher> entry : dataMap.entrySet()) {
             if (upList.size() >= Constants.HBASE_BATCH_SIZE) {
+                System.out.println("===============begin add to hbase=================");
                 service.submit(new LoadToHBase(upList));
                 upList.clear();
             } else {

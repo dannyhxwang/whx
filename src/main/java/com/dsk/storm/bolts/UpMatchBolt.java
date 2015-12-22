@@ -38,7 +38,7 @@ public class UpMatchBolt extends BaseRichBolt {
 //        String line = tuple.getString(0);
         String items[] = line.split(",");
         if(items.length == 10) {
-            System.out.println(line);
+//            System.out.println(line);
             String currentDate = items[9].trim();
 
             //如果当前数据日期与上一条数据日期不同，则认为前一天的数据发送完毕
@@ -48,6 +48,7 @@ public class UpMatchBolt extends BaseRichBolt {
 //            if (num > 20000) {
                 //store to hbase
                 if (dataMap.size() > 0) {
+                    System.out.println("----------------------------" + dataMap.size());
                     new HbaseTask(dataMap).dowork();
 //                    num = 0;
                 }
