@@ -1,5 +1,6 @@
 package com.dsk.storm.service;
 
+import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.AuthorizationException;
@@ -50,12 +51,15 @@ public class HBaseCount {
         TridentConfig config = new TridentConfig("test", "key");
         config.setStateCacheSize(5000);
         config.addColumn("f", "count");
+        config.setBatch(true);
         StateFactory state = HBaseAggregateState.transactional(config);
         TridentTopology topology = new TridentTopology();
         topology
                 .newStream("spout", tridentKafkaSpout)
                 .groupBy(new Fields("key"))
                 .persistentAggregate(state, new Count(), new Fields("count"));
+
+        Config conf = new Config();
         conf.setNumWorkers(1);
         //LocalCluster cluster = new LocalCluster();
         //cluster.submitTopology("test_state",conf,topology.build());
