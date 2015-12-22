@@ -71,7 +71,9 @@ public class HbaseTask {
             Table table = null;
             try {
                 table = conn.getTable(TableName.valueOf(Constants.UPMATCH_TABLE));
+                table.setWriteBufferSize(1024*1024*2);
                 table.put(puts);
+                System.out.println("===============puts size=================" + puts.size());
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
