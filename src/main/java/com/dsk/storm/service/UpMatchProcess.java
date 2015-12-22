@@ -43,7 +43,7 @@ public class UpMatchProcess {
         config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
 //        config.setNumAckers(3);
-        config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 30);
+        config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 60);
         StormSubmitter.submitTopology("testupmatch", config, builder.createTopology());
     }
 }

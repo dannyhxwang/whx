@@ -33,7 +33,7 @@ public class Constants {
     public static final int DEFAULT_BATCH_SIZE = 10000;
 
     //hbase
-    public static final int HBASE_BATCH_SIZE = 2000;
+    public static final int HBASE_BATCH_SIZE = 100000;
     public static final String UPMATCH_TABLE = "upmatch";
     public static final String FAMILY_NAME = "info";
 }
