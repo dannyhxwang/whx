@@ -30,7 +30,6 @@ public class HbaseTask {
     }
 
     public void dowork() {
-        Table table = null;
         UpMatcher upMatcher = null;
         ExecutorService service = Executors.newFixedThreadPool(2);
 
@@ -74,6 +73,12 @@ public class HbaseTask {
                 table.put(puts);
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    table.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
