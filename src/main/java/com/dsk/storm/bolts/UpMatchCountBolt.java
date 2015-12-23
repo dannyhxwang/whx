@@ -36,25 +36,29 @@ public class UpMatchCountBolt extends BaseRichBolt {
             System.out.println("----------------------------" + dataMap.size());
         } else {
 //            String line = input.getStringByField("line");
-            if (input.size() == 2) {
-                Object obj2 = input.getValue(1);
-                String line = obj2.toString();
-                String[] items = line.split(",");
-                UpMatcher upMatcher = dataMap.get(rowkey);
-                int count = 1;
-                if (StringUtils.isNotBlank(items[8])) {
-                    count = Integer.valueOf(items[8]);
-                }
-                if (upMatcher != null) {
-                    count += upMatcher.getCount();
-                    upMatcher.setCount(count);
+            try {
+                if (input.size() == 2) {
+                    Object obj2 = input.getValue(1);
+                    String line = obj2.toString();
+                    String[] items = line.split(",");
+                    UpMatcher upMatcher = dataMap.get(rowkey);
+                    int count = 1;
+                    if (StringUtils.isNotBlank(items[8])) {
+                        count = Integer.valueOf(items[8]);
+                    }
+                    if (upMatcher != null) {
+                        count += upMatcher.getCount();
+                        upMatcher.setCount(count);
+                    } else {
+                        upMatcher = new UpMatcher(items[0], items[1], items[2], items[3], items[4], items[5],
+                                items[6], items[7], count);
+                    }
+                    dataMap.put(rowkey, upMatcher);
                 } else {
-                    upMatcher = new UpMatcher(items[0], items[1], items[2], items[3], items[4], items[5],
-                            items[6], items[7], count);
+                    System.out.println(rowkey);
                 }
-                dataMap.put(rowkey, upMatcher);
-            } else {
-                System.out.println(rowkey);
+            } catch (Exception e) {
+                System.out.println("==================================" + input);
             }
 
         }
