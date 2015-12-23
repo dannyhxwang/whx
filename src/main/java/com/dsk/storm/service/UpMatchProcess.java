@@ -7,7 +7,9 @@ import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
-import com.dsk.storm.bolts.UpMatchBolt;
+import backtype.storm.tuple.Fields;
+import com.dsk.storm.bolts.UpMatchCountBolt;
+import com.dsk.storm.bolts.UpMatchETLBolt;
 import com.dsk.utils.Constants;
 import storm.kafka.*;
 import storm.kafka.bolt.KafkaBolt;
@@ -31,9 +33,10 @@ public class UpMatchProcess {
 //        spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("upmatch_spout", new KafkaSpout(spoutConfig));
-        builder.setBolt("upmatch_bolt", new UpMatchBolt(), 3).shuffleGrouping("upmatch_spout");
+        builder.setBolt("upmatch_etl", new UpMatchETLBolt(), 3).shuffleGrouping("upmatch_spout");
+        builder.setBolt("upmatch_count", new UpMatchCountBolt(), 3).fieldsGrouping("upmatch_etl", new Fields("rowkey"));
 
-        Config config = new Config();
+                Config config = new Config();
         Properties props = new Properties();
         props.put("metadata.broker.list", Constants.BROKER_LIST);
         props.put("request.required.acks", "1");
@@ -43,7 +46,7 @@ public class UpMatchProcess {
         config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
 //        config.setNumAckers(3);
-        config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 600);
+        config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 30);
         StormSubmitter.submitTopology("testupmatch", config, builder.createTopology());
     }
 }

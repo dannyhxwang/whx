@@ -4,7 +4,9 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import com.dsk.bean.UpMatcher;
 import com.dsk.hbase.HbaseTask;
 import com.dsk.utils.StringOperator;
@@ -17,15 +19,17 @@ import java.util.Map;
  * Created by wanghaixing
  * on 2015/12/17 11:06.
  */
-public class UpMatchBolt extends BaseRichBolt {
+public class UpMatchETLBolt extends BaseRichBolt {
     private OutputCollector collector;
     private Map<String, UpMatcher> dataMap;
     private String preDate;
     private int num = 0;
+    private int taskId = 0;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
+        this.taskId = topologyContext.getThisTaskId();
         dataMap = new HashMap<String, UpMatcher>();
     }
 
@@ -35,10 +39,11 @@ public class UpMatchBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
         String sourceComponent = tuple.getSourceComponent();
         if (sourceComponent.equals(backtype.storm.Constants.SYSTEM_COMPONENT_ID)) {
-            if (dataMap.size() > 0) {
+            /*if (dataMap.size() > 0) {
                 System.out.println("----------------------------" + dataMap.size());
-                new HbaseTask(dataMap).dowork();
-            }
+//                new HbaseTask(dataMap).dowork();
+            }*/
+            this.collector.emit(new Values(String.valueOf(taskId), null));
         } else {
             Object obj = tuple.getValue(0);
             String line = obj.toString();
@@ -60,7 +65,8 @@ public class UpMatchBolt extends BaseRichBolt {
                     }
                 } else {*/
                     String rowkey = StringOperator.encryptByMd5(items[0] + items[1] + items[2] + items[3] + items[4]);
-                    UpMatcher upMatcher = dataMap.get(rowkey);
+                    this.collector.emit(new Values(rowkey, line));
+                    /*UpMatcher upMatcher = dataMap.get(rowkey);
                     int count = 1;
                     if (StringUtils.isNotBlank(items[8])) {
                         count = Integer.valueOf(items[8]);
@@ -72,7 +78,7 @@ public class UpMatchBolt extends BaseRichBolt {
                         upMatcher = new UpMatcher(items[0], items[1], items[2], items[3], items[4], items[5],
                                 items[6], items[7], count);
                     }
-                    dataMap.put(rowkey, upMatcher);
+                    dataMap.put(rowkey, upMatcher);*/
 //                num++;
 //                }
 //            preDate = currentDate;
@@ -86,8 +92,8 @@ public class UpMatchBolt extends BaseRichBolt {
     }
 
     @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields("rowkey", "line"));
     }
 
 
