@@ -39,7 +39,7 @@ public class UpMatchCountBolt extends BaseRichBolt {
 //        if (rowkey.equals(String.valueOf(input.getSourceTask()))) {
         if (rowkey.equals(String.valueOf(stormConf.get(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS)))) {
 //            System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%" + stormConf.get(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS));
-//            System.out.println("----------------------------" + dataMap.size());
+            System.out.println("----------------------------" + dataMap.size());
             new HbaseTask(dataMap).dowork();
         } else {
 //            String line = input.getStringByField("line");
