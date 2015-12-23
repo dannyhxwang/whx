@@ -1,7 +1,5 @@
-package com.dsk.storm.state;
+package com.dsk.storm.test;
 
-import com.dsk.utils.HTableConnector;
-import com.dsk.utils.TridentConfig;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
@@ -62,6 +60,8 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
      */
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
+        System.out.println("==================keys size==============" + keys.size());
+        System.out.println("==================keys size==============" + keys.toString());
         List<Get> gets = new ArrayList<Get>(keys.size());
         byte[] rk;
         byte[] cf;

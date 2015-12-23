@@ -1,13 +1,15 @@
-package com.dsk.utils;
+package com.dsk.storm.test;
 
 import backtype.storm.tuple.Tuple;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Configuration for Storm {@link Tuple} to HBase serialization.
@@ -140,33 +142,32 @@ public class TupleTableConfig implements Serializable {
 
     /**
      * Increment the counter for the given family and column by the specified amount
-     * <p/>
+     * <p>
      * If the family and column already exist in the Increment the counter value is incremented by the
      * specified amount rather than overridden, as it is in HBase's
      * {@link Increment#addColumn(byte[], byte[], long)} method
-     *
-     * @param inc       The {@link Increment} to update
-     * @param family    The column family
+     * @param inc The {@link Increment} to update
+     * @param family The column family
      * @param qualifier The column qualifier
-     * @param amount    The amount to increment the counter by
+     * @param amount The amount to increment the counter by
      */
-    public static void addIncrement(Increment inc, final byte[] family, final byte[] qualifier,
-                                    final Long amount) {
-
-        NavigableMap<byte[], Long> set = (NavigableMap<byte[], Long>) inc.getFamilyMap().get(family);
-        if (set == null) {
-            set = new TreeMap<byte[], Long>(Bytes.BYTES_COMPARATOR);
-        }
-
-        // If qualifier exists, increment amount
-        Long counter = set.get(qualifier);
-        if (counter == null) {
-            counter = 0L;
-        }
-        set.put(qualifier, amount + counter);
-
-        inc.getFamilyMap().put(family, (List<KeyValue>) set);
-    }
+//  public static void addIncrement(Increment inc, final byte[] family, final byte[] qualifier,
+//      final Long amount) {
+//
+//    NavigableMap<byte[], Long> set = inc.getFamilyMap().get(family);
+//    if (set == null) {
+//      set = new TreeMap<byte[], Long>(Bytes.BYTES_COMPARATOR);
+//    }
+//
+//    // If qualifier exists, increment amount
+//    Long counter = set.get(qualifier);
+//    if (counter == null) {
+//      counter = 0L;
+//    }
+//    set.put(qualifier, amount + counter);
+//
+//    inc.getFamilyMap().put(family, set);
+//  }
 
     /**
      * @return the tableName
