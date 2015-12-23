@@ -69,8 +69,10 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
 
         for (List<Object> k : keys) {
             rk = Bytes.toBytes((String) k.get(0));
-            cf = Bytes.toBytes((String) k.get(1));
-            cq = Bytes.toBytes((String) k.get(2));
+//            cf = Bytes.toBytes((String) k.get(1));
+//            cq = Bytes.toBytes((String) k.get(2));
+            cf = Bytes.toBytes("f");
+            cq = Bytes.toBytes("count");
             Get g = new Get(rk);
             gets.add(g.addColumn(cf, cq));
         }
@@ -87,8 +89,10 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
         List<T> rtn = new ArrayList<T>(keys.size());
 
         for (int i = 0; i < keys.size(); i++) {
-            cf = Bytes.toBytes((String) keys.get(i).get(1));
-            cq = Bytes.toBytes((String) keys.get(i).get(2));
+//            cf = Bytes.toBytes((String) keys.get(i).get(1));
+//            cq = Bytes.toBytes((String) keys.get(i).get(2));
+            cf = Bytes.toBytes("f");
+            cq = Bytes.toBytes("count");
             Result r = results[i];
             if (r.isEmpty()) {
                 rtn.add(null);
@@ -109,8 +113,10 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
 
         for (int i = 0; i < keys.size(); i++) {
             byte[] rk = Bytes.toBytes((String) keys.get(i).get(0));
-            byte[] cf = Bytes.toBytes((String) keys.get(i).get(1));
-            byte[] cq = Bytes.toBytes((String) keys.get(i).get(2));
+//            byte[] cf = Bytes.toBytes((String) keys.get(i).get(1));
+//            byte[] cq = Bytes.toBytes((String) keys.get(i).get(2));
+            byte[] cf = Bytes.toBytes("f");
+            byte[] cq = Bytes.toBytes("count");
             byte[] cv = serializer.serialize(vals.get(i));
             Put p = new Put(rk);
             puts.add(p.add(cf, cq, cv));
