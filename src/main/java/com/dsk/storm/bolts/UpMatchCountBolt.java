@@ -55,7 +55,7 @@ public class UpMatchCountBolt extends BaseRichBolt {
                     }
                     dataMap.put(rowkey, upMatcher);
                 } else {
-                    System.out.println("++++++++++++++++++++++++++" + rowkey);
+                    System.out.println("++++++++++++++++++++++++++" + input.size() + "++++++++++++++++++++++" + rowkey);
                 }
             } catch (Exception e) {
                 System.out.println("==================================" + input);
