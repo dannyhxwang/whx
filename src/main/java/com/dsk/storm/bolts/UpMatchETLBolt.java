@@ -40,7 +40,7 @@ public class UpMatchETLBolt extends BaseRichBolt {
         String sourceComponent = tuple.getSourceComponent();
         if (sourceComponent.equals(backtype.storm.Constants.SYSTEM_COMPONENT_ID)) {
 //            System.out.println(String.valueOf("********************************" + taskId));
-            this.collector.emit(new Values(String.valueOf(taskId), "a"));
+//            this.collector.emit(new Values(String.valueOf(taskId), "a"));
         } else {
             Object obj = tuple.getValue(0);
             String line = obj.toString();
