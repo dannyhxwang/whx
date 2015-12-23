@@ -35,7 +35,9 @@ public class UpMatchCountBolt extends BaseRichBolt {
         if (rowkey.equals(String.valueOf(input.getSourceTask()))) {
             System.out.println("----------------------------" + dataMap.size());
         } else {
-            String line = input.getStringByField("line");
+//            String line = input.getStringByField("line");
+            Object obj2 = input.getValue(1);
+            String line = obj2.toString();
             String[] items = line.split(",");
             UpMatcher upMatcher = dataMap.get(rowkey);
             int count = 1;
