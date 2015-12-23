@@ -63,6 +63,7 @@ public class UpMatchCountBolt extends BaseRichBolt {
                     System.out.println("++++++++++++++++++++++++++" + input.size() + "++++++++++++++++++++++" + rowkey);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 System.out.println("==================================" + input);
             }
 
