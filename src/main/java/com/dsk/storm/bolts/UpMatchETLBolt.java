@@ -39,15 +39,11 @@ public class UpMatchETLBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
         String sourceComponent = tuple.getSourceComponent();
         if (sourceComponent.equals(backtype.storm.Constants.SYSTEM_COMPONENT_ID)) {
-            /*if (dataMap.size() > 0) {
-                System.out.println("----------------------------" + dataMap.size());
-//                new HbaseTask(dataMap).dowork();
-            }*/
             this.collector.emit(new Values(String.valueOf(taskId), null));
         } else {
             Object obj = tuple.getValue(0);
             String line = obj.toString();
-//        String line = tuple.getString(0);
+//            String line = tuple.getString(0);
             String items[] = line.split(",");
             if(items.length == 10) {
 //            System.out.println(line);
