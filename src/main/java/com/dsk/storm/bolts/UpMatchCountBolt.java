@@ -35,8 +35,9 @@ public class UpMatchCountBolt extends BaseRichBolt {
         Object obj = input.getValue(0);
         String rowkey = obj.toString();
 //        System.out.println(rowkey);
-//        if (rowkey.equals(String.valueOf(input.getSourceTask()))) {
-        if (rowkey.equals(stormConf.get(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS))) {
+        if (rowkey.equals(String.valueOf(input.getSourceTask()))) {
+//        if (rowkey.equals(stormConf.get(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS))) {
+            System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%" + stormConf.get(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS));
             System.out.println("----------------------------" + dataMap.size());
         } else {
 //            String line = input.getStringByField("line");
