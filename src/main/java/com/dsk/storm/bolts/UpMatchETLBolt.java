@@ -40,7 +40,7 @@ public class UpMatchETLBolt extends BaseRichBolt {
         String sourceComponent = tuple.getSourceComponent();
         if (sourceComponent.equals(backtype.storm.Constants.SYSTEM_COMPONENT_ID)) {
             System.out.println(String.valueOf("********************************" + taskId));
-            this.collector.emit(new Values(String.valueOf(taskId), ""));
+            this.collector.emit(new Values(String.valueOf(taskId), "a"));
         } else {
             Object obj = tuple.getValue(0);
             String line = obj.toString();
@@ -62,6 +62,9 @@ public class UpMatchETLBolt extends BaseRichBolt {
                     }
                 } else {*/
                     String rowkey = StringOperator.encryptByMd5(items[0] + items[1] + items[2] + items[3] + items[4]);
+                    if (rowkey.equals("30")) {
+                        System.out.println("################################");
+                    }
                     if (StringUtils.isNotBlank(rowkey))
                         this.collector.emit(new Values(rowkey, line));
                     /*UpMatcher upMatcher = dataMap.get(rowkey);
