@@ -60,6 +60,8 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
      */
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
+        System.out.println("==================keys size==============" + keys.size());
+        System.out.println("==================keys size==============" + keys.toString());
         List<Get> gets = new ArrayList<Get>(keys.size());
         byte[] rk;
         byte[] cf;
