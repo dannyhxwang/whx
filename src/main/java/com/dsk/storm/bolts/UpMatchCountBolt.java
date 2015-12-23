@@ -1,5 +1,6 @@
 package com.dsk.storm.bolts;
 
+import backtype.storm.Config;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -18,11 +19,13 @@ import java.util.Map;
 public class UpMatchCountBolt extends BaseRichBolt {
     private OutputCollector collector;
     private Map<String, UpMatcher> dataMap;
+    private Map stormConf;
 
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
+        this.stormConf = stormConf;
         dataMap = new HashMap<String, UpMatcher>();
     }
 
@@ -32,7 +35,8 @@ public class UpMatchCountBolt extends BaseRichBolt {
         Object obj = input.getValue(0);
         String rowkey = obj.toString();
 //        System.out.println(rowkey);
-        if (rowkey.equals(String.valueOf(input.getSourceTask()))) {
+//        if (rowkey.equals(String.valueOf(input.getSourceTask()))) {
+        if (rowkey.equals(stormConf.get(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS))) {
             System.out.println("----------------------------" + dataMap.size());
         } else {
 //            String line = input.getStringByField("line");
