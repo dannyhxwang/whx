@@ -18,4 +18,9 @@
         <name>dfs.permissions</name>
         <value>false</value>
     </property>
+
+    <property>
+        <name>fs.hdfs.impl</name>
+        <value>org.apache.hadoop.hdfs.DistributedFileSystem</value>
+    </property>
 </configuration>
