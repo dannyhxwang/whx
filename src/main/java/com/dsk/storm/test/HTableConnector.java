@@ -1,4 +1,4 @@
-package com.dsk.utils;
+package com.dsk.storm.test;
 
 import backtype.storm.generated.Bolt;
 import org.apache.hadoop.conf.Configuration;

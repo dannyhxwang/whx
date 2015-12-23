@@ -1,6 +1,5 @@
-package com.dsk.utils;
+package com.dsk.storm.test;
 
-import com.esotericsoftware.minlog.Log;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -10,6 +9,7 @@ import storm.trident.tuple.TridentTuple;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Configuration for Storm Trident state persistence in HBase
@@ -100,7 +100,7 @@ public class TridentConfig<T> extends TupleTableConfig {
                     try {
                         g.setMaxVersions(1);
                     } catch (IOException e) {
-                        Log.error("Invalid number of versions", e);
+                        //Log.error("Invalid number of versions", e);
                     }
                     if (ts > 0) {
                         try {

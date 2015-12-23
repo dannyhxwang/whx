@@ -1,7 +1,5 @@
-package com.dsk.storm.state;
+package com.dsk.storm.test;
 
-import com.dsk.utils.HTableConnector;
-import com.dsk.utils.TridentConfig;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
