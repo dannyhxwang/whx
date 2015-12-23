@@ -37,7 +37,7 @@ public class UpMatchBolt extends BaseRichBolt {
         if (sourceComponent.equals(backtype.storm.Constants.SYSTEM_COMPONENT_ID)) {
             if (dataMap.size() > 0) {
                 System.out.println("----------------------------" + dataMap.size());
-                new HbaseTask(dataMap).dowork();
+//                new HbaseTask(dataMap).dowork();
             }
         } else {
             Object obj = tuple.getValue(0);
