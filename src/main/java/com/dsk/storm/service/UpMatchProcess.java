@@ -33,10 +33,10 @@ public class UpMatchProcess {
 //        spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("upmatch_spout", new KafkaSpout(spoutConfig));
-        builder.setBolt("upmatch_etl", new UpMatchETLBolt(), 3).shuffleGrouping("upmatch_spout");
-        builder.setBolt("upmatch_count", new UpMatchCountBolt(), 3).fieldsGrouping("upmatch_etl", new Fields("rowkey"));
+        builder.setBolt("upmatch_etl", new UpMatchETLBolt()).shuffleGrouping("upmatch_spout");
+        builder.setBolt("upmatch_count", new UpMatchCountBolt()).fieldsGrouping("upmatch_etl", new Fields("rowkey"));
 
-                Config config = new Config();
+        Config config = new Config();
         Properties props = new Properties();
         props.put("metadata.broker.list", Constants.BROKER_LIST);
         props.put("request.required.acks", "1");
