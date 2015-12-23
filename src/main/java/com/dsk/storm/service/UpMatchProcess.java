@@ -33,8 +33,8 @@ public class UpMatchProcess {
 //        spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 
         builder.setSpout("upmatch_spout", new KafkaSpout(spoutConfig));
-        builder.setBolt("upmatch_etl", new UpMatchETLBolt()).shuffleGrouping("upmatch_spout");
-        builder.setBolt("upmatch_count", new UpMatchCountBolt()).fieldsGrouping("upmatch_etl", new Fields("rowkey"));
+        builder.setBolt("upmatch_etl", new UpMatchETLBolt(), 3).shuffleGrouping("upmatch_spout");
+        builder.setBolt("upmatch_count", new UpMatchCountBolt(), 3).fieldsGrouping("upmatch_etl", new Fields("rowkey"));
 
         Config config = new Config();
         Properties props = new Properties();
@@ -46,7 +46,7 @@ public class UpMatchProcess {
         config.setMaxSpoutPending(5000);
         config.setMessageTimeoutSecs(60);
 //        config.setNumAckers(3);
-        config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 30);
+        config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 60);
         StormSubmitter.submitTopology("testupmatch", config, builder.createTopology());
     }
 }
