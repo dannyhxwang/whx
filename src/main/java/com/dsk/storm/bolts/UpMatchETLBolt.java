@@ -43,7 +43,7 @@ public class UpMatchETLBolt extends BaseRichBolt {
                 System.out.println("----------------------------" + dataMap.size());
 //                new HbaseTask(dataMap).dowork();
             }*/
-            this.collector.emit(new Values(taskId, null));
+            this.collector.emit(new Values(String.valueOf(taskId), null));
         } else {
             Object obj = tuple.getValue(0);
             String line = obj.toString();
