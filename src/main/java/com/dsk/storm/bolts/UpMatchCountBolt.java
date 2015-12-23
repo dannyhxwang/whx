@@ -28,8 +28,10 @@ public class UpMatchCountBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        String rowkey = input.getStringByField("rowkey");
-        System.out.println(rowkey);
+//        String rowkey = input.getStringByField("rowkey");
+        Object obj = input.getValue(0);
+        String rowkey = obj.toString();
+//        System.out.println(rowkey);
         if (rowkey.equals(String.valueOf(input.getSourceTask()))) {
             System.out.println("----------------------------" + dataMap.size());
         } else {
