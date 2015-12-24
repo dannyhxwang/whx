@@ -1,13 +1,14 @@
 package com.dsk.storm.test;
 
 import backtype.storm.Config;
-import backtype.storm.StormSubmitter;
+import backtype.storm.LocalCluster;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import com.google.common.collect.Lists;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import storm.kafka.BrokerHosts;
@@ -86,7 +87,8 @@ public class TestHBase {
 
         TridentConfig config = new TridentConfig("testa", "key");
         config.setBatch(true);
-        config.addColumn("f", "count");
+        config.setFamily("f".getBytes());
+        config.setColumns(Lists.newArrayList("count".getBytes()));
         StateFactory state = HBaseAggregateState.transactional(config);
 
         TridentTopology topology = new TridentTopology();
@@ -98,7 +100,9 @@ public class TestHBase {
 
         Config conf = new Config();
         conf.setNumWorkers(1);
-        StormSubmitter.submitTopology("hbase-trident-aggregate-testa", conf, topology.build());
+//        StormSubmitter.submitTopology("hbase-trident-aggregate-testa", conf, topology.build());
 
+        LocalCluster cluster = new LocalCluster();
+        cluster.submitTopology("hello", conf, topology.build());
     }
 }

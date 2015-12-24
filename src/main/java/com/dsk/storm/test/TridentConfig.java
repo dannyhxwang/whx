@@ -8,6 +8,7 @@ import storm.trident.tuple.TridentTuple;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -31,6 +32,26 @@ public class TridentConfig<T> extends TupleTableConfig {
     private int stateCacheSize = 1000;
     private Serializer<T> stateSerializer;
 
+    public byte[] getFamily() {
+        return family;
+    }
+
+    public void setFamily(byte[] family) {
+        this.family = family;
+    }
+
+    private byte[] family;
+
+    public List<byte[]> getColumns() {
+        return columns;
+    }
+
+    public void setColumns(List<byte[]> columns) {
+        this.columns = columns;
+    }
+
+    private List<byte[]> columns;
+
     public TridentConfig(String table, String rowKeyField) {
         super(table, rowKeyField);
     }
@@ -38,6 +59,7 @@ public class TridentConfig<T> extends TupleTableConfig {
     public TridentConfig(final String table, final String rowKeyField, final String timestampField) {
         super(table, rowKeyField, timestampField);
     }
+
 
     /**
      * Creates a HBase {@link Put} from a Storm {@link TridentTuple}

@@ -16,11 +16,10 @@ public class TestHBaseETL extends BaseFunction {
         // TODO need etl ?
         if (tuple.getString(0).split(",").length == 10) {
             String[] lines = tuple.getString(0).split(",");
-            for (String value : lines) {
-                collector.emit(new Values(value));
+            if (lines[8].length() == 0) {
+                lines[8] = "0";
             }
-        } else {
-            System.out.println("ERROR=== " + tuple.getString(0));
+            collector.emit(new Values(lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7], Long.valueOf(lines[8]), lines[9]));
         }
     }
 }

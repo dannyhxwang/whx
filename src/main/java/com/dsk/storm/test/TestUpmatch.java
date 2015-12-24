@@ -7,6 +7,7 @@ import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.tuple.Fields;
+import com.google.common.collect.Lists;
 import storm.kafka.BrokerHosts;
 import storm.kafka.StringScheme;
 import storm.kafka.ZkHosts;
@@ -41,27 +42,31 @@ public class TestUpmatch {
         BrokerHosts hosts = new ZkHosts("datanode1:2181,datanode2:2181,datanode4:2181");
         TridentKafkaConfig tridentKafkaConfig =
                 new TridentKafkaConfig(hosts, "test", UUID.randomUUID().toString());
-        tridentKafkaConfig.ignoreZkOffsets = true;
+        //tridentKafkaConfig.ignoreZkOffsets = true;
         tridentKafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         TransactionalTridentKafkaSpout tridentKafkaSpout = new TransactionalTridentKafkaSpout(tridentKafkaConfig);
 
         TridentConfig config = new TridentConfig("testa", "key");
         config.setBatch(true);
-        config.addColumn("f", "count");
+        config.setFamily("f".getBytes());
+        config.setColumns(Lists.newArrayList(
+                "v11".getBytes(), "v22".getBytes(), "v33".getBytes(), "v44".getBytes(), "v55".getBytes(), "v66".getBytes(), "v77".getBytes(), "v88".getBytes(), "countAAA".getBytes()));
         StateFactory state = HBaseAggregateState.transactional(config);
 
         TridentTopology topology = new TridentTopology();
         topology
                 .newStream("spout", tridentKafkaSpout)
                 .each(new Fields("str"), new TestHBaseETL(), new Fields("v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10"))
-                .groupBy(new Fields("v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"))
-                .persistentAggregate(state, new Sum(), new Fields("count"));
+                .project(new Fields("v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10"))
+                .groupBy(new Fields("v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8"))
+                .persistentAggregate(state, new Fields("v9"), new Sum(), new Fields("count"));
 
         Config conf = new Config();
         conf.setNumWorkers(1);
         StormSubmitter.submitTopology("hbase-trident-aggregate-testa", conf, topology.build());
-        //LocalCluster cluster = new LocalCluster();
-        //cluster.submitTopology("hello",conf,topology.build());
+//        LocalCluster cluster = new LocalCluster();
+//        cluster.submitTopology("hello", conf, topology.build());
+
 
     }
 }

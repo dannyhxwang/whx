@@ -1,7 +1,7 @@
 package com.dsk.storm.service;
 
 import backtype.storm.Config;
-import backtype.storm.StormSubmitter;
+import backtype.storm.LocalCluster;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
@@ -51,8 +51,8 @@ public class RequestCount {
 
         Config conf = new Config();
         conf.setNumWorkers(2);
-        //LocalCluster cluster = new LocalCluster();
-        //cluster.submitTopology("test_state",conf,topology.build());
-        StormSubmitter.submitTopologyWithProgressBar(Constants.TOPIC_REQUEST_COUNT, conf, topology.build());
+        LocalCluster cluster = new LocalCluster();
+        cluster.submitTopology("test_state", conf, topology.build());
+        //StormSubmitter.submitTopologyWithProgressBar(Constants.TOPIC_REQUEST_COUNT, conf, topology.build());
     }
 }

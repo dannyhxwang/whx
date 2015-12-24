@@ -1,6 +1,6 @@
 package com.dsk.storm.test;
 
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -10,12 +10,19 @@ import java.util.Set;
  */
 public class Main {
     public static void main(String[] args) {
-        TridentConfig config = new TridentConfig("testa", "key");
-        config.addColumn("f", "count");
+//        TridentConfig config = new TridentConfig("testa", "key");
+//        config.addColumn("f", "count");
+//
+//        Map<String, Set<String>> map = config.columnFamilies;
+//        for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
+//            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//        }
+        Set<String> cols = new HashSet<String>();
+        cols.add("ab");
+        cols.add("aa");
+        cols.add("bb");
 
-        Map<String, Set<String>> map = config.columnFamilies;
-        for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
-            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-        }
+        System.out.println(cols.toString());
+
     }
 }
