@@ -46,11 +46,12 @@ public class TestUpmatch {
         tridentKafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         TransactionalTridentKafkaSpout tridentKafkaSpout = new TransactionalTridentKafkaSpout(tridentKafkaConfig);
 
-        TridentConfig config = new TridentConfig("testa", "key");
+        TridentConfig config = new TridentConfig("upmatch", "key");
         config.setBatch(true);
-        config.setFamily("f".getBytes());
+        config.setFamily("info".getBytes());
         config.setColumns(Lists.newArrayList(
-                "v11".getBytes(), "v22".getBytes(), "v33".getBytes(), "v44".getBytes(), "v55".getBytes(), "v66".getBytes(), "v77".getBytes(), "v88".getBytes(), "countAAA".getBytes()));
+                "uid".getBytes(), "db".getBytes(), "tab".getBytes(), "rec".getBytes(), "ext".getBytes(),
+                "ver".getBytes(), "nation".getBytes(), "pid".getBytes(), "count".getBytes()));
         StateFactory state = HBaseAggregateState.transactional(config);
 
         TridentTopology topology = new TridentTopology();
