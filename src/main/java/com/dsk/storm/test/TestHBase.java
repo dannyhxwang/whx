@@ -80,7 +80,7 @@ public class TestHBase {
         BrokerHosts hosts = new ZkHosts("datanode1:2181,datanode2:2181,datanode4:2181");
         TridentKafkaConfig tridentKafkaConfig =
                 new TridentKafkaConfig(hosts, "test", UUID.randomUUID().toString());
-        tridentKafkaConfig.ignoreZkOffsets = true;
+        //tridentKafkaConfig.ignoreZkOffsets = true;
         tridentKafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         TransactionalTridentKafkaSpout tridentKafkaSpout = new TransactionalTridentKafkaSpout(tridentKafkaConfig);
 
