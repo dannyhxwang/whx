@@ -41,7 +41,7 @@ public class TestUpmatch {
     public static void main(String[] args) throws InterruptedException, InvalidTopologyException, AlreadyAliveException, AuthorizationException {
         BrokerHosts hosts = new ZkHosts("datanode1:2181,datanode2:2181,datanode4:2181");
         TridentKafkaConfig tridentKafkaConfig =
-                new TridentKafkaConfig(hosts, "test", UUID.randomUUID().toString());
+                new TridentKafkaConfig(hosts, "test_upmatch", UUID.randomUUID().toString());
         //tridentKafkaConfig.ignoreZkOffsets = true;
         tridentKafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         TransactionalTridentKafkaSpout tridentKafkaSpout = new TransactionalTridentKafkaSpout(tridentKafkaConfig);
@@ -64,7 +64,7 @@ public class TestUpmatch {
 
         Config conf = new Config();
         conf.setNumWorkers(1);
-        StormSubmitter.submitTopology("hbase-trident-aggregate-testa", conf, topology.build());
+        StormSubmitter.submitTopology("hbase-trident-test-upmatch", conf, topology.build());
 //        LocalCluster cluster = new LocalCluster();
 //        cluster.submitTopology("hello", conf, topology.build());
 
