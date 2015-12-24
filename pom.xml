@@ -55,6 +55,7 @@
             <artifactId>storm-core</artifactId>
             <version>0.10.0</version>
             <scope>provided</scope>
+            <!-- local cluster test -->
             <!--<scope>compile</scope>-->
             <exclusions>
                 <exclusion>
@@ -121,6 +122,12 @@
             <artifactId>jedis</artifactId>
             <version>2.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.3</version>
+        </dependency>
+
 
         <!--<dependency>-->
             <!--<groupId>redis.embedded</groupId>-->
