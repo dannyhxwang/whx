@@ -31,7 +31,7 @@ public class HbaseTask {
 
     public void dowork() {
         UpMatcher upMatcher = null;
-        ExecutorService service = Executors.newFixedThreadPool(2);
+        ExecutorService service = Executors.newFixedThreadPool(1);
 
         for(Map.Entry<String, UpMatcher> entry : dataMap.entrySet()) {
             if (upList.size() >= Constants.HBASE_BATCH_SIZE) {
