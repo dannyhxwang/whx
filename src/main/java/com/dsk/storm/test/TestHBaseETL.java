@@ -14,6 +14,13 @@ public class TestHBaseETL extends BaseFunction {
     @Override
     public void execute(TridentTuple tuple, TridentCollector collector) {
         // TODO need etl ?
-        collector.emit(new Values(tuple.getString(0)));
+        if (tuple.getString(0).split(",").length == 10) {
+            String[] lines = tuple.getString(0).split(",");
+            for (String value : lines) {
+                collector.emit(new Values(value));
+            }
+        } else {
+            System.out.println("ERROR=== " + tuple.getString(0));
+        }
     }
 }
