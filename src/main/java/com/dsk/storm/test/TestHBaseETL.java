@@ -22,7 +22,7 @@ public class TestHBaseETL extends BaseFunction {
                 lines[8] = "0";
             }
             String rowkey = StringOperator.encryptByMd5(lines[0] + lines[1] + lines[2] + lines[3] + lines[4]);
-            collector.emit(new Values(rowkey.getBytes(), lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7], Long.valueOf(lines[8]), lines[9]));
+            collector.emit(new Values(rowkey, lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7], Long.valueOf(lines[8]), lines[9]));
         }
     }
 }
