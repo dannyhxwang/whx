@@ -1,6 +1,7 @@
 package com.dsk.storm.test;
 
 import backtype.storm.tuple.Values;
+import com.dsk.utils.StringOperator;
 import storm.trident.operation.BaseFunction;
 import storm.trident.operation.TridentCollector;
 import storm.trident.tuple.TridentTuple;
@@ -20,7 +21,8 @@ public class TestHBaseETL extends BaseFunction {
             if (lines[8].length() == 0) {
                 lines[8] = "0";
             }
-            collector.emit(new Values(lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7], Long.valueOf(lines[8]), lines[9]));
+            String rowkey = StringOperator.encryptByMd5(lines[0] + lines[1] + lines[2] + lines[3] + lines[4]);
+            collector.emit(new Values(rowkey.getBytes(), lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7], Long.valueOf(lines[8]), lines[9]));
         }
     }
 }
