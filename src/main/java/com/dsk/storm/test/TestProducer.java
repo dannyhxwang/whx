@@ -29,7 +29,7 @@ public class TestProducer {
         // 产生并发送消息
         long start = System.currentTimeMillis();
         for (long i = 0; i < events; i++) {
-            String value = "1,2,3,4,5,7,8,1,10";
+            String value = "3,2,3,4,5,6,7,8,5,10";
             //如果topic不存在，则会自动创建，默认replication-factor为1，partitions为0
             KeyedMessage<String, String> data = new KeyedMessage<String, String>(
                     "test_count", null, value);
