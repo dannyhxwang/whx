@@ -125,6 +125,7 @@ public class HBaseAggregateState<T> implements IBackingMap<T> {
                 }
             }
             Put p = new Put(rk);
+            System.out.println("++++++++++++++++++++ Val" + vals.get(i));
             puts.add(p.add(family, lastColumn, serializer.serialize(vals.get(i))));
 //            byte[] rk = Bytes.toBytes((String) keys.get(i).get(0));
 //            byte[] cf = Bytes.toBytes("f");
