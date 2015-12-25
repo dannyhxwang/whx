@@ -14,6 +14,7 @@ public class TestHBaseETL extends BaseFunction {
     @Override
     public void execute(TridentTuple tuple, TridentCollector collector) {
         // TODO need etl ?
+        System.out.println("--------------------------------------" + tuple.toString());
         if (tuple.getString(0).split(",").length == 10) {
             String[] lines = tuple.getString(0).split(",");
             if (lines[8].length() == 0) {
