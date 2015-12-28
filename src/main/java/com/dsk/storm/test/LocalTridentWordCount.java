@@ -13,6 +13,7 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.AuthorizationException;
 import backtype.storm.generated.InvalidTopologyException;
+import org.apache.avro.generic.GenericData;
 import org.apache.commons.io.FileUtils;
 
 import storm.trident.TridentTopology;
@@ -39,7 +40,7 @@ public class LocalTridentWordCount {
 		}
 		@Override
 		public void emitBatch(long batchId, TridentCollector collector) {
-			List<List<Object>> batch = this.batches.get(batchId);
+			/*List<List<Object>> batch = this.batches.get(batchId);
 	        if(batch == null){
 	            batch = new ArrayList<List<Object>>();
 	            Collection<File> listFiles = FileUtils.listFiles(new File("10.1.3.55:/home/hadoop/data"), new String[]{"txt"}, true);
@@ -59,9 +60,15 @@ public class LocalTridentWordCount {
 	        }
 	        for(List<Object> list : batch){
 	            collector.emit(list);
-	        }
-			
-			
+	        }*/
+
+			List<Object> list = new ArrayList<Object>();
+			list.add("a");
+			list.add("b");
+			list.add("c");
+			for(int i = 0; i < 9; i++) {
+				collector.emit(list);
+			}
 		}
 
 		@Override
