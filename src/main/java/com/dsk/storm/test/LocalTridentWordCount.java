@@ -142,7 +142,7 @@ public class LocalTridentWordCount {
 	public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
 		TridentTopology tridentTopology = new TridentTopology();
 		tridentTopology.newStream("spout_id", new DataSpout())
-		.each(new Fields("line"), new SplitBolt(), new Fields("word"))
+		.each(new Fields("line"), new SplitBolt(), new Fields("word")).shuffle()
 		.each(new Fields("word"), new WordCount(), new Fields("")).parallelismHint(2);
 
 		StormSubmitter.submitTopology("sumTopology", new Config(), tridentTopology.build());
