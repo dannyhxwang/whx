@@ -62,11 +62,17 @@ public class LocalTridentWordCount {
 	            collector.emit(list);
 	        }*/
 
-			List<Object> list = new ArrayList<Object>();
-			list.add("a");
-			list.add("b");
-			list.add("c");
-			for(int i = 0; i < 9; i++) {
+			List<List<Object>> batch = this.batches.get(batchId);
+			if(batch == null){
+				batch = new ArrayList<List<Object>>();
+				for(int i = 0; i < 3; i++) {
+					batch.add(new Values("a"));
+					batch.add(new Values("b"));
+					batch.add(new Values("c"));
+				}
+				this.batches.put(batchId, batch);
+			}
+			for(List<Object> list : batch){
 				collector.emit(list);
 			}
 		}
