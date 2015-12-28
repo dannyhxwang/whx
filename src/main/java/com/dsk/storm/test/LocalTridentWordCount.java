@@ -42,7 +42,7 @@ public class LocalTridentWordCount {
 			List<List<Object>> batch = this.batches.get(batchId);
 	        if(batch == null){
 	            batch = new ArrayList<List<Object>>();
-	            Collection<File> listFiles = FileUtils.listFiles(new File("/home/hadoop/data"), new String[]{"txt"}, true);
+	            Collection<File> listFiles = FileUtils.listFiles(new File("10.1.3.55:/home/hadoop/data"), new String[]{"txt"}, true);
 	            for (File file : listFiles) {
 					try {
 						List<String> lines = FileUtils.readLines(file);
