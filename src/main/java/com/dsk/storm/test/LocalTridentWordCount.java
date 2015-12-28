@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.AuthorizationException;
+import backtype.storm.generated.InvalidTopologyException;
 import org.apache.commons.io.FileUtils;
 
 import storm.trident.TridentTopology;
@@ -122,14 +126,15 @@ public class LocalTridentWordCount {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
 		TridentTopology tridentTopology = new TridentTopology();
 		tridentTopology.newStream("spout_id", new DataSpout())
 		.each(new Fields("line"), new SplitBolt(), new Fields("word"))
 		.each(new Fields("word"), new WordCount(), new Fields("")).parallelismHint(2);
 
-		LocalCluster localCluster = new LocalCluster();
-		localCluster.submitTopology("sumTopology", new Config(), tridentTopology.build());
+		StormSubmitter.submitTopology("sumTopology", new Config(), tridentTopology.build());
+//		LocalCluster localCluster = new LocalCluster();
+//		localCluster.submitTopology("sumTopology", new Config(), tridentTopology.build());
 	}
 	
 }
